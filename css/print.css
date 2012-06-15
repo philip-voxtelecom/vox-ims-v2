@@ -1,0 +1,29 @@
+.titleLabel {
+    color: #000000;
+    margin-left: 0px;
+    margin-top: 20px;
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: 16px;
+    text-decoration: underline;
+}
+.detailTable {
+    margin-left: 1em;
+    margin-top: 5px;
+
+}
+.detailTable .label {
+    font-weight: bold;
+}
+
+.noprint {
+    display: none;
+}
+
+.detailTable .detail {
+    padding-left: 5em;
+}
+
+.border {
+    border-style: solid;
+}
