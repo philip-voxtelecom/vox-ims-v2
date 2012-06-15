@@ -142,7 +142,7 @@ class Owner_rux extends Owner {
         if (!isset($this->status))
             $this->status = 'active';
 
-        $check = OwnerFactory::Create('rux');
+        $check = OwnerFactory::Create();
         if ($check->read($this->login) == $this->login) {
             throw new Exception("$this->login already exists");
         }
@@ -233,7 +233,7 @@ class OwnerList_rux extends OwnerList {
             throw new Exception("Could not get owner list");
         }
         while ($row = $result->fetch_assoc()) {
-            $owner = OwnerFactory::Create('rux');
+            $owner = OwnerFactory::Create();
             $owner->read($row['id']);
             $this->list->addItem($owner);
         }
@@ -248,8 +248,8 @@ class OwnerList_rux extends OwnerList {
 
 class OwnerFactory {
 
-    public static function Create($provider) {
-        if ($provider == 'rux') {
+    public static function Create() {
+        if ($GLOBALS['config']->provider == 'rux') {
             return new Owner_rux();
         }
     }
@@ -258,8 +258,8 @@ class OwnerFactory {
 
 class OwnerListFactory {
 
-    public static function Create($provider) {
-        if ($provider == 'rux') {
+    public static function Create() {
+        if ($GLOBALS['config']->provider == 'rux') {
             return new OwnerList_rux();
         }
     }
