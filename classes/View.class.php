@@ -3,9 +3,9 @@
 require_once($GLOBALS['documentroot'] . "/libs/xajax/xajax_core/xajax.inc.php");
 require_once($GLOBALS['documentroot'] . "/libs/Smarty/Smarty.class.php");
 
-class View {
+abstract class View {
 
-    protected $xajax;
+    
     protected $smarty;
     protected $viewobject;
     protected $module;
@@ -28,8 +28,6 @@ class View {
         $this->smarty->cache_dir = $GLOBALS['documentroot'] . '/cache';
         $this->smarty->config_dir = $GLOBALS['documentroot'] . '/configs';
 
-        $this->xajax = new xajaxResponse();
-
         //set current template directory for view
         $this->setModule($GLOBALS['module']);
 
@@ -40,9 +38,7 @@ class View {
         }
     }
 
-    protected function display() {
-        return;
-    }
+    abstract protected function display();
 
     /**
      *
