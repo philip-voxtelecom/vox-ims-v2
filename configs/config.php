@@ -5,6 +5,7 @@ require $GLOBALS['documentroot'] . '/classes/Config.class.php';
 $config = new Config();
 
 $config->VERSION = '0.9.0';
+$config->debug = TRUE;
 
 // ADSL system this system is interacting with
 $config->provider = 'rux';
