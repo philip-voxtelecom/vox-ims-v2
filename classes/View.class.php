@@ -5,7 +5,6 @@ require_once($GLOBALS['documentroot'] . "/libs/Smarty/Smarty.class.php");
 
 abstract class View {
 
-    
     protected $smarty;
     protected $viewobject;
     protected $module;
@@ -27,6 +26,8 @@ abstract class View {
         $this->smarty->compile_dir = $GLOBALS['documentroot'] . '/templates_c';
         $this->smarty->cache_dir = $GLOBALS['documentroot'] . '/cache';
         $this->smarty->config_dir = $GLOBALS['documentroot'] . '/configs';
+        if ($GLOBALS['config']->debug)
+            $this->smarty->debugging = TRUE;
 
         //set current template directory for view
         $this->setModule($GLOBALS['module']);
@@ -45,9 +46,9 @@ abstract class View {
      * @param string $module module templates to use
      */
     public function setModule($module) {
-        if (isset($module) and file_exists($GLOBALS['documentroot'] . '/templates/' . $module)) {
+        if (isset($module) and file_exists($GLOBALS['documentroot'] . '/templates/' . $module . '/' . $GLOBALS['config']->view)) {
             $this->module = $module;
-            $this->smarty->template_dir = $GLOBALS['documentroot'] . '/templates/' . $this->module;
+            $this->smarty->template_dir = $GLOBALS['documentroot'] . '/templates/' . $this->module . '/' . $GLOBALS['config']->view;
         } else {
             $this->module = NULL;
             $this->smarty->template_dir = $GLOBALS['documentroot'] . $this->default_template;
@@ -61,7 +62,7 @@ abstract class View {
 }
 
 class ViewObject extends SimpleXMLElement {
-
+    
 }
 
 ?>
