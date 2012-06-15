@@ -1,6 +1,8 @@
 <?php
 
-require_once('_db.php');
+if (file_exists($GLOBALS['documentroot'] . '/Models/' . $GLOBALS['module'] . '/' . $GLOBALS['config']->provider . '/_owner_model.php')) {
+    include($GLOBALS['documentroot'] . '/Models/' . $GLOBALS['module'] . '/' . $GLOBALS['config']->provider . '/_owner_model.php');
+}
 
 abstract class Owner {
 
@@ -174,11 +176,23 @@ abstract class Owner {
         return $this->userList;
     }
 
+    public function asXML() {
+        if (empty($this->id))
+            return NULL;
+        $xml = new SimpleXMLElement('<root/>');
+        $data = $xml->addChild('owner');
+        $data->addChild('id', $this->id);
+        foreach ($this->members as $member => $value) {
+            $data->addChild($member, $value);
+        }
+        return $xml;
+    }
+
 }
 
 class OwnerList {
 
-    protected $list;
+    protected $list = NULL;
     protected $dbh;
 
     function __construct() {
@@ -187,45 +201,20 @@ class OwnerList {
     }
 
     public function getList() {
-        $this->list = new Collection();
-        $query = "select id from owners";
-        $result = $this->dbh->query($query);
-        if (!$result) {
-            throw new Exception("Could not get owner list");
-        }
-        while ($row = $result->fetch_assoc()) {
-            $owner = OwnerFactory::Create();
-            $owner->read($row['id']);
-            $this->list->addItem($owner);
+        if (empty($this->list)) {
+            $this->list = new Collection();
+            $query = "select id from owners order by id";
+            $result = $this->dbh->query($query);
+            if (!$result) {
+                throw new Exception("Could not get owner list");
+            }
+            while ($row = $result->fetch_assoc()) {
+                $owner = OwnerFactory::Create();
+                $owner->read($row['id']);
+                $this->list->addItem($owner);
+            }
         }
         return $this->list;
-    }
-}
-
-class Owner_rux extends Owner {
-
-    public function create() {
-        if (isset($this->id))
-            throw new Exception("Cannot re-use owner object for create");
-        if (!isset($this->login) or !isset($this->password))
-            throw new Exception("owner create requires login and password to be set");
-        if (!isset($this->status))
-            $this->status = 'active';
-
-        $check = OwnerFactory::Create();
-        if ($check->read($this->login) == $this->login) {
-            throw new Exception("$this->login already exists");
-        }
-        unset($check);
-
-        $query = "insert into owners(id,login,password,primaryemail,name,status,comments)
-                      values ('$this->login','$this->login','$this->password','$this->primaryemail','$this->name','$this->status','$this->comments')";
-        $result = $this->dbh->query($query);
-        if (!$result) {
-            throw new Exception("Could not add owner details");
-        }
-        $this->id = $this->login;
-        return TRUE;
     }
 
 }
@@ -237,8 +226,11 @@ class Owner_rux extends Owner {
 class OwnerFactory {
 
     public static function Create() {
-        if ($GLOBALS['config']->provider == 'rux') {
-            return new Owner_rux();
+        $required_class = "Owner_" . $GLOBALS['config']->provider;
+        if (class_exists($required_class)) {
+            return new $required_class();
+        } else {
+            throw new Exception("No OwnerFactory exists for provider");
         }
     }
 
@@ -247,7 +239,7 @@ class OwnerFactory {
 class OwnerListFactory {
 
     public static function Create() {
-            return new OwnerList();
+        return new OwnerList();
     }
 
 }
