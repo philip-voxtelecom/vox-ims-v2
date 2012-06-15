@@ -73,91 +73,6 @@ abstract class Owner {
 
     abstract public function create();
 
-    abstract public function read($id);
-
-    abstract public function update();
-
-    abstract public function delete();
-
-    /*
-     * return the owner login Id
-     */
-
-    public function getId() {
-        return $this->id;
-    }
-
-    /*
-     * returns a collection of this owner's products
-     */
-
-    public function getProductList() {
-        if (empty($this->productList)) {
-            try {
-                // TODO 
-            } catch (Exception $e) {
-                throw new Exception("Error in owner::getProductList" . $e->getMessage());
-            }
-        }
-        return $this->productList;
-    }
-
-    /*
-     * returns a collection of owners user objects
-     */
-
-    public function getUserList() {
-        if (empty($this->userList)) {
-            try {
-                // TODO
-            } catch (Exception $e) {
-                throw new Exception("Error in owner::getUserList" . $e->getMessage());
-            }
-        }
-        return $this->userList;
-    }
-
-}
-
-abstract class OwnerList {
-
-    protected $list;
-    protected $dbh;
-
-    function __construct() {
-        $this->dbh = MetaDatabaseConnection::get()->handle();
-        return $this->getList();
-    }
-
-    abstract public function getList();
-}
-
-class Owner_rux extends Owner {
-
-    public function create() {
-        if (isset($this->id))
-            throw new Exception("Cannot re-use owner object for create");
-        if (!isset($this->login) or !isset($this->password))
-            throw new Exception("owner create requires login and password to be set");
-        if (!isset($this->status))
-            $this->status = 'active';
-
-        $check = OwnerFactory::Create();
-        if ($check->read($this->login) == $this->login) {
-            throw new Exception("$this->login already exists");
-        }
-        unset($check);
-
-        $query = "insert into owners(id,login,password,primaryemail,name,status,comments)
-                      values ('$this->login','$this->login','$this->password','$this->primaryemail','$this->name','$this->status','$this->comments')";
-        $result = $this->dbh->query($query);
-        if (!$result) {
-            throw new Exception("Could not add owner details");
-        }
-        $this->id = $this->login;
-        return TRUE;
-    }
-
     public function read($id) {
         $this->members = $this->null_members;
         $this->id = NULL;
@@ -221,9 +136,55 @@ class Owner_rux extends Owner {
         return FALSE;
     }
 
+    /*
+     * return the owner login Id
+     */
+
+    public function getId() {
+        return $this->id;
+    }
+
+    /*
+     * returns a collection of this owner's products
+     */
+
+    public function getProductList() {
+        if (empty($this->productList)) {
+            try {
+                // TODO 
+            } catch (Exception $e) {
+                throw new Exception("Error in owner::getProductList" . $e->getMessage());
+            }
+        }
+        return $this->productList;
+    }
+
+    /*
+     * returns a collection of owners user objects
+     */
+
+    public function getUserList() {
+        if (empty($this->userList)) {
+            try {
+                // TODO
+            } catch (Exception $e) {
+                throw new Exception("Error in owner::getUserList" . $e->getMessage());
+            }
+        }
+        return $this->userList;
+    }
+
 }
 
-class OwnerList_rux extends OwnerList {
+class OwnerList {
+
+    protected $list;
+    protected $dbh;
+
+    function __construct() {
+        $this->dbh = MetaDatabaseConnection::get()->handle();
+        return $this->getList();
+    }
 
     public function getList() {
         $this->list = new Collection();
@@ -238,6 +199,33 @@ class OwnerList_rux extends OwnerList {
             $this->list->addItem($owner);
         }
         return $this->list;
+    }
+}
+
+class Owner_rux extends Owner {
+
+    public function create() {
+        if (isset($this->id))
+            throw new Exception("Cannot re-use owner object for create");
+        if (!isset($this->login) or !isset($this->password))
+            throw new Exception("owner create requires login and password to be set");
+        if (!isset($this->status))
+            $this->status = 'active';
+
+        $check = OwnerFactory::Create();
+        if ($check->read($this->login) == $this->login) {
+            throw new Exception("$this->login already exists");
+        }
+        unset($check);
+
+        $query = "insert into owners(id,login,password,primaryemail,name,status,comments)
+                      values ('$this->login','$this->login','$this->password','$this->primaryemail','$this->name','$this->status','$this->comments')";
+        $result = $this->dbh->query($query);
+        if (!$result) {
+            throw new Exception("Could not add owner details");
+        }
+        $this->id = $this->login;
+        return TRUE;
     }
 
 }
@@ -259,9 +247,7 @@ class OwnerFactory {
 class OwnerListFactory {
 
     public static function Create() {
-        if ($GLOBALS['config']->provider == 'rux') {
-            return new OwnerList_rux();
-        }
+            return new OwnerList();
     }
 
 }
