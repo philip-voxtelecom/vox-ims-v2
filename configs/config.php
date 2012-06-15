@@ -6,6 +6,9 @@ $config = new Config();
 
 $config->VERSION = '0.9.0';
 
+// ADSL system this system is interacting with
+$config->provider = 'rux';
+
 // Global defaults. Localise in local_config.php. This will make upgrading easier
 // set the documentroot for the application
 $config->documentroot = $GLOBALS['documentroot'];
