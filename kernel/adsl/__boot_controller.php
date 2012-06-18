@@ -10,7 +10,7 @@ include '_cache.php';
 include '_common_functions.php';
 include '_init_controller.php';
 //include '_accountlist_controller.php';
-//include '_account_controller.php';
+include '_account_controller.php';
 //include '_user_controller.php';
 include '_product_controller.php';
 //include '_userproduct_controller.php';
