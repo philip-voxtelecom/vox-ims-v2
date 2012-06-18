@@ -17,10 +17,10 @@
                        xajax_accountActionDisplay({$accounts[name].id});
                        new Effect.Pulsate('right_bar_content', {ldelim} pulses: 1,duration: 0.5,from: 0.4 {rdelim});"
         >
-        <td style="width: 5px;"><input type="radio" name="account_id" id="id{$accounts[name].id}" value="{$accounts[name].id}"/>
+ 
         <td id="list_data1">{$accounts[name].username}</td>
         <td style="width: 100%" id="userlist_data2">{$accounts[name].description}</td>
-        <td id="list_data5">{$accounts[name].status|capitalize}</td>
+
     </tr>
 	{/section}
     <tr class="empty">
