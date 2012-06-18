@@ -10,6 +10,7 @@ class Owner_rux extends Owner {
         if (!isset($this->status))
             $this->status = 'active';
 
+        // TODO check if the user exists on rux
         $check = OwnerFactory::Create();
         if ($check->read($this->login) == $this->login) {
             throw new Exception("$this->login already exists");
