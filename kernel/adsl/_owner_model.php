@@ -1,8 +1,8 @@
 <?php
 
-if (file_exists($GLOBALS['documentroot'] . '/Models/' . $GLOBALS['module'] . '/' . $GLOBALS['config']->provider . '/_owner_model.php')) {
-    include($GLOBALS['documentroot'] . '/Models/' . $GLOBALS['module'] . '/' . $GLOBALS['config']->provider . '/_owner_model.php');
-}
+$model = 'owner';
+
+load_provider_model($model);
 
 abstract class Owner {
 
@@ -26,6 +26,15 @@ abstract class Owner {
      */
     protected $userList;
     protected $productList;
+
+    public function __sleep() {
+        return array('id', 'null_members', 'members');
+    }
+
+    public function __wakeup() {
+        $this->dbh = MetaDatabaseConnection::get('owner')->handle();
+        ;
+    }
 
     public function __set($name, $value) {
         if (isset($this->members[$name])) {
@@ -69,7 +78,7 @@ abstract class Owner {
     }
 
     function __construct() {
-        $this->dbh = MetaDatabaseConnection::get()->handle();
+        $this->dbh = MetaDatabaseConnection::get('owner')->handle();
         $this->members = $this->null_members;
     }
 
@@ -80,11 +89,23 @@ abstract class Owner {
         $this->id = NULL;
         if (!empty($id) and addslashes($id) == $id) {
             $query = "select * from owners where id='$id'";
-            $result = $this->dbh->query($query);
-            if (!$result) {
-                throw new Exception("Could not get owner details");
+            if ($GLOBALS['config']->adsl_meta_dbtype == 'pdodb') {
+                try {
+                    $sth = $this->dbh->prepare($query);
+                } catch (Exception $e) {
+                    print $e->getMessage();
+                }
+                $result = $sth->execute();
+                if (!$result) {
+                    throw new Exception("Could not get owner details");
+                }
+
+                $row = $sth->fetch(PDO::FETCH_ASSOC);
+            } elseif ($GLOBALS['config']->adsl_meta_dbtype == 'mysqli') {
+                $result = $this->dbh->query($query);
+                $row = $result->fetch_assoc();
             }
-            $row = $result->fetch_assoc();
+
             if (!empty($row)) {
                 $this->id = $row['id'];
                 $this->login = $row['login'];
@@ -115,7 +136,12 @@ abstract class Owner {
                     comments='$this->comments'
                   where id='$this->id'
                 ";
-        $result = $this->dbh->query($query);
+        if ($GLOBALS['config']->adsl_meta_dbtype == 'pdodb') {
+            $sth = $this->dbh->prepare($query);
+            $result = $sth->execute();
+        } elseif ($GLOBALS['config']->adsl_meta_dbtype == 'mysqli') {
+            $result = $this->dbh->query($query);
+        }
         if (!$result) {
             throw new Exception("Could not update owner details");
         }
@@ -125,7 +151,12 @@ abstract class Owner {
     public function delete() {
         if (!empty($this->id)) {
             $query = "delete from owners where id='$this->id'";
-            $result = $this->dbh->query($query);
+            if ($GLOBALS['config']->adsl_meta_dbtype == 'pdodb') {
+                $sth = $this->dbh->prepare($query);
+                $result = $sth->execute();
+            } elseif ($GLOBALS['config']->adsl_meta_dbtype == 'mysqli') {
+                $result = $this->dbh->query($query);
+            }
             if (!$result) {
                 throw new Exception("Could not delete owner");
             }
@@ -196,7 +227,7 @@ class OwnerList {
     protected $dbh;
 
     function __construct() {
-        $this->dbh = MetaDatabaseConnection::get()->handle();
+        $this->dbh = MetaDatabaseConnection::get('ownerlist')->handle();
         return $this->getList();
     }
 
@@ -204,14 +235,27 @@ class OwnerList {
         if (empty($this->list)) {
             $this->list = new Collection();
             $query = "select id from owners order by id";
-            $result = $this->dbh->query($query);
-            if (!$result) {
-                throw new Exception("Could not get owner list");
-            }
-            while ($row = $result->fetch_assoc()) {
-                $owner = OwnerFactory::Create();
-                $owner->read($row['id']);
-                $this->list->addItem($owner);
+            if ($GLOBALS['config']->adsl_meta_dbtype == 'pdodb') {
+                $sth = $this->dbh->prepare($query);
+                $result = $sth->execute();
+                if (!$result) {
+                    throw new Exception("Could not get owner list");
+                }
+                while ($row = $sth->fetch(PDO::FETCH_ASSOC)) {
+                    $owner = OwnerFactory::Create();
+                    $owner->read($row['id']);
+                    $this->list->addItem($owner);
+                }
+            } elseif ($GLOBALS['config']->adsl_meta_dbtype == 'mysqli') {
+                $result = $this->dbh->query($query);
+                if (!$result) {
+                    throw new Exception("Could not get owner list");
+                }
+                while ($row = $result->fetch_assoc()) {
+                    $owner = OwnerFactory::Create();
+                    $owner->read($row['id']);
+                    $this->list->addItem($owner);
+                }                
             }
         }
         return $this->list;
