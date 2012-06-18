@@ -97,26 +97,26 @@
     display: none;
 }
 
-#userlist_tbl {
+#list_tbl {
     margin: 5px 10px 0px 10px;
 }
-#userlist_tbl tr.odd {
+#list_tbl tr.odd {
     background-color: #E0E0E0;
 }
 
-#userlist_tbl tr.even {
+#list_tbl tr.even {
     background-color: #FFFFFF;
 }
 
-#userlist_tbl tr.even:hover {
+#list_tbl tr.even:hover {
     background-color: #CCCCFF;
 }
 
-#userlist_tbl tr.odd:hover {
+#list_tbl tr.odd:hover {
     background-color: #CCCCFF;
 }
 
-#userlist_tbl td {
+#list_tbl td {
     padding: 1px 3px;
 }
 .selected_row {
