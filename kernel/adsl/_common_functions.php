@@ -100,28 +100,32 @@ function decrypt($str) {
     return $result;
 }
 
-function append_simplexml(&$simplexml_to, &$simplexml_from)
-{
-    foreach ($simplexml_from->children() as $simplexml_child)
-    {
-        $simplexml_temp = $simplexml_to->addChild($simplexml_child->getName(), (string) $simplexml_child);
-        foreach ($simplexml_child->attributes() as $attr_key => $attr_value)
-        {
+function append_simplexml(&$simplexml_to, &$simplexml_from) {
+    foreach ($simplexml_from->children() as $simplexml_child) {
+        $simplexml_temp = $simplexml_to->addChild($simplexml_child->getName(), htmlspecialchars((string) $simplexml_child));
+        foreach ($simplexml_child->attributes() as $attr_key => $attr_value) {
             $simplexml_temp->addAttribute($attr_key, $attr_value);
         }
-       
+
         append_simplexml($simplexml_temp, $simplexml_child);
     }
-} 
-/*  
-$arr = array(
+}
+
+function load_provider_model($model) {
+    if (file_exists($GLOBALS['documentroot'] . '/Models/' . $GLOBALS['module'] . '/' . $GLOBALS['config']->provider . '/_' . $model . '_model.php')) {
+        include($GLOBALS['documentroot'] . '/Models/' . $GLOBALS['module'] . '/' . $GLOBALS['config']->provider . '/_' . $model . '_model.php');
+    }
+}
+
+/*
+  $arr = array(
   'pet_name'=>"fido",
   'favorite_food'=>"cat poop",
   'unique_id'=>3848908043
-);
-$param_string = encrypt(serialize($arr));
+  );
+  $param_string = encrypt(serialize($arr));
  *
-$param_string = $_GET["params"];
-$params = unserialize(decrypt($param_string));
+  $param_string = $_GET["params"];
+  $params = unserialize(decrypt($param_string));
  */
 ?>
