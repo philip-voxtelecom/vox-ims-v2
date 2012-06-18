@@ -48,7 +48,7 @@ class initPageView_ims extends View {
         }
         if ($GLOBALS['auth']->checkAuth('adsl_product', AUTH_READ)) {
             $menulist = $menulist . '
-           <li><a href="#" onclick="xajax_displayOwnerProductList(\'%\',0);">Products</a></li>
+           <li><a href="#" onclick="xajax_displayProductList(\'%\',0);">Products</a></li>
          ';
         }
         $this->smarty->assign('menulist', $menulist);
