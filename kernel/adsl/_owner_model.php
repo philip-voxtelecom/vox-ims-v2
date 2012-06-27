@@ -125,11 +125,10 @@ abstract class Owner {
             }
             $this->id = NULL;
             $this->members = array();
-            return TRUE;
         } else {
             throw new Exception('No owner instantiated for deletion');
         }
-        return FALSE;
+        return TRUE;
     }
 
     public function members() {
