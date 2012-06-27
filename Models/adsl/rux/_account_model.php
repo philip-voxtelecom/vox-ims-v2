@@ -129,7 +129,7 @@ class Account_rux extends Account {
         $this->product = $result['account']['accountProfile']['id'];
         if (isset($result['account']['attributes'])) {
             foreach ($result['account']['attributes'] as $attrib) {
-                if (isset($attrib['key']))
+                if (isset($attrib['key']) and isset($attrib['value']))
                     $this->$attrib['key'] = $attrib['value'];
             }
         }
