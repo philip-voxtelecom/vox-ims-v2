@@ -134,18 +134,17 @@ class AccountController {
                 $this->account = AccountFactory::Create();
                 $this->account->read($id);
             } catch (Exception $e) {
-                throw new Exception("Could not load account for update: " . $e->getMessage());
+                throw new Exception("Could not load account for delete: " . $e->getMessage());
             }
         }
 
         try {
             $this->account->delete();
             unset($this->account);
-            return TRUE;
         } catch (Exception $e) {
             throw new Exception("Problem encountered deleting account");
-            return FALSE;
         }
+        return TRUE;
     }
 
     public function listall($offset = 0, $limit = 0, $search = NULL) {
