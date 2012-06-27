@@ -89,21 +89,11 @@ abstract class Owner {
         $this->id = NULL;
         if (!empty($id) and addslashes($id) == $id) {
             $query = "select * from owners where id='$id'";
-            if ($GLOBALS['config']->adsl_meta_dbtype == 'pdodb') {
-                try {
-                    $sth = $this->dbh->prepare($query);
-                } catch (Exception $e) {
-                    print $e->getMessage();
-                }
-                $result = $sth->execute();
-                if (!$result) {
-                    throw new Exception("Could not get owner details");
-                }
-
-                $row = $sth->fetch(PDO::FETCH_ASSOC);
-            } elseif ($GLOBALS['config']->adsl_meta_dbtype == 'mysqli') {
+            if ($GLOBALS['config']->adsl_meta_dbtype == 'mysqli') {
                 $result = $this->dbh->query($query);
                 $row = $result->fetch_assoc();
+            } else {
+                throw new Exception("Unsupported DB type for adsl_meta_dbtype");
             }
             if (!empty($row)) {
                 $this->id = $row['id'];
@@ -135,11 +125,10 @@ abstract class Owner {
                     comments='$this->comments'
                   where id='$this->id'
                 ";
-        if ($GLOBALS['config']->adsl_meta_dbtype == 'pdodb') {
-            $sth = $this->dbh->prepare($query);
-            $result = $sth->execute();
-        } elseif ($GLOBALS['config']->adsl_meta_dbtype == 'mysqli') {
+        if ($GLOBALS['config']->adsl_meta_dbtype == 'mysqli') {
             $result = $this->dbh->query($query);
+        } else {
+            throw new Exception("Unsupported DB type for adsl_meta_dbtype");
         }
         if (!$result) {
             throw new Exception("Could not update owner details");
@@ -150,11 +139,10 @@ abstract class Owner {
     public function delete() {
         if (!empty($this->id)) {
             $query = "delete from owners where id='$this->id'";
-            if ($GLOBALS['config']->adsl_meta_dbtype == 'pdodb') {
-                $sth = $this->dbh->prepare($query);
-                $result = $sth->execute();
-            } elseif ($GLOBALS['config']->adsl_meta_dbtype == 'mysqli') {
+            if ($GLOBALS['config']->adsl_meta_dbtype == 'mysqli') {
                 $result = $this->dbh->query($query);
+            } else {
+                throw new Exception("Unsupported DB type for adsl_meta_dbtype");
             }
             if (!$result) {
                 throw new Exception("Could not delete owner");
@@ -175,7 +163,7 @@ abstract class Owner {
     public function members() {
         return $this->members;
     }
-    
+
     public function getId() {
         return $this->id;
     }
@@ -221,7 +209,7 @@ abstract class Owner {
         }
         return $xml;
     }
-    
+
     public function getRealms() {
 
         if (!isset($this->id))
@@ -237,6 +225,7 @@ abstract class Owner {
         }
         return $realms;
     }
+
 }
 
 class OwnerList {
@@ -253,18 +242,7 @@ class OwnerList {
         if (empty($this->list)) {
             $this->list = new Collection();
             $query = "select id from owners order by id";
-            if ($GLOBALS['config']->adsl_meta_dbtype == 'pdodb') {
-                $sth = $this->dbh->prepare($query);
-                $result = $sth->execute();
-                if (!$result) {
-                    throw new Exception("Could not get owner list");
-                }
-                while ($row = $sth->fetch(PDO::FETCH_ASSOC)) {
-                    $owner = OwnerFactory::Create();
-                    $owner->read($row['id']);
-                    $this->list->addItem($owner);
-                }
-            } elseif ($GLOBALS['config']->adsl_meta_dbtype == 'mysqli') {
+            if ($GLOBALS['config']->adsl_meta_dbtype == 'mysqli') {
                 $result = $this->dbh->query($query);
                 if (!$result) {
                     throw new Exception("Could not get owner list");
@@ -273,7 +251,9 @@ class OwnerList {
                     $owner = OwnerFactory::Create();
                     $owner->read($row['id']);
                     $this->list->addItem($owner);
-                }                
+                }
+            } else {
+                throw new Exception("Unsupported DB type for adsl_meta_dbtype");
             }
         }
         return $this->list;

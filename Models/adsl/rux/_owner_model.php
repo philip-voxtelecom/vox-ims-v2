@@ -38,8 +38,6 @@ class Owner_rux extends Owner {
         return TRUE;
     }
 
-
-
 }
 
 ?>
