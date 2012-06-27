@@ -5,7 +5,7 @@
     <tr><th>ID</th><th>Name</th><th>Status</th></tr>
 	{section name=name loop=$products}
     <tr id="list_row" class="{cycle values="odd,even"}" onclick="xajax_productDetailDisplay({$products[name].id});">
-        <td id="productlist_data1">{$products[name].reference}</td>
+        <td id="productlist_data1">{$products[name].productId}</td>
         <td id="productlist_data2">{$products[name].name}</td>
         <td id="productlist_data5">{$products[name].status}</td>
     </tr>

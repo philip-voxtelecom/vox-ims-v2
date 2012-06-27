@@ -7,7 +7,7 @@
     <tr id="list_row" class="{cycle values="odd,even"}" onclick="xajax_ownerDetailDisplay({$owners[name].id});">
         <td id="ownerlist_data1">{$owners[name].login}</td>
         <td id="ownerlist_data2">{$owners[name].name}</td>
-        <td id="ownerlist_data4">{$owners[name].email}</td>
+        <td id="ownerlist_data4">{$owners[name].primaryemail}</td>
         <td id="ownerlist_data5">{$owners[name].status}</td>
     </tr>
 	{/section}
