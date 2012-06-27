@@ -6,6 +6,9 @@ class VoxADSL {
     private $username;
     private $password;
     private $url = NULL;
+    
+    const OK = 'COMPLETED';
+    const FAILED = 'FAILED';
 
     function call_method($param) {
 
@@ -37,7 +40,8 @@ class VoxADSL {
                     ));
             ini_set('default_socket_timeout', 300);
             $result_json = file_get_contents($this->url, null, $http_context);
-            return json_decode($result_json,true);
+            $result = json_decode($result_json,true);
+            return $result;
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
@@ -46,14 +50,15 @@ class VoxADSL {
     function loadMethod($service, $methodName) {
 
         $URL_ADSL_SERVICES = "http://rux-test.voxdev.co.za";
+        //$URL_ADSL_SERVICES = "http://rux.vox.co.za";
         $URL_ADSL_SERVICES_USER = 'philipc';
         $URL_ADSL_SERVICES_PASS = 'Bpcxsa4%^';
         $URL_ADSL_SERVICES_EXCHANGE = 'T2';
 
-        $URL_ADSL_USAGE = "http://10.25.0.112:8888";
+        $URL_ADSL_USAGE = "http://rux.vox.co.za";
         $URL_ADSL_USAGE_USER = 'philipc';
         $URL_ADSL_USAGE_PASS = 'Bpcxsa4%^';
-        $URL_ADSL_USAGE_EXCHANGE = 'ADSL';
+        $URL_ADSL_USAGE_EXCHANGE = 'T2';
 
         /*
          * Account services
@@ -104,26 +109,27 @@ class VoxADSL {
         /*
          * Account usage services
          */
-        $methodList['usage']['URL'] = $URL_ADSL_SERVICES;
-        $methodList['usage']['exchange'] = $URL_ADSL_SERVICES_EXCHANGE;
-        $methodList['usage']['username'] = $URL_ADSL_SERVICES_USER;
-        $methodList['usage']['password'] = $URL_ADSL_SERVICES_PASS;
+        $methodList['usage']['URL'] = $URL_ADSL_USAGE;
+        $methodList['usage']['exchange'] = $URL_ADSL_USAGE_EXCHANGE;
+        $methodList['usage']['username'] = $URL_ADSL_USAGE_USER;
+        $methodList['usage']['password'] = $URL_ADSL_USAGE_PASS;
         $methodList['usage']['method']['findbyid'] = '/V2/ADSL/USAGE/FINDBYID';
         $methodList['usage']['method']['dailybymonth'] = '/V2/ADSL/USAGE/DAILYBYMONTH';
         $methodList['usage']['method']['totalusagebymonth'] = '/V2/ADSL/USAGE/TOTALUSAGEBYMONTH';
         $methodList['usage']['method']['totalusage'] = '/V2/ADSL/USAGE/TOTALUSAGE';
         $methodList['usage']['method']['totalusagebydaterange'] = '/V2/ADSL/USAGE/TOTALUSAGEBYDATERANGE';
-        $methodList['usage']['method']['totalusagebymonth'] = '/V2/ADSL/USAGE/TOTALUSAGEBYMONTH';
         $methodList['usage']['method']['forreference'] = '/V2/ADSL/USAGE/FORREFERENCE';
+        $methodList['usage']['method']['bynumberofmonthsforaccount'] = '/V2/ADSL/USAGE/BYNUMBEROFMONTHSFORACCOUNT';
 
         /*
-         * ADSL usage methods
-         */
+         * ADSL usage methods - deprecated
         $methodList['adsl']['URL'] = $URL_ADSL_USAGE;
         $methodList['adsl']['exchange'] = $URL_ADSL_USAGE_EXCHANGE;
         $methodList['adsl']['username'] = $URL_ADSL_USAGE_USER;
         $methodList['adsl']['password'] = $URL_ADSL_USAGE_PASS;
         $methodList['adsl']['method']['usage'] = '/ADSL/USAGE';
+         * 
+         */
 
         $service = strtolower($service);
         $methodName = strtolower($methodName);

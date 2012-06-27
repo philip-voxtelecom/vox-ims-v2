@@ -4,6 +4,16 @@ require_once('_vox_adslservices.php');
 
 class Product_rux extends Product {
 
+    protected static $provider_options = array(
+        'bundle' => array(
+            'description' => 'Bundle Size',
+            'defaultvalue' => '0',
+            'value' => NULL,
+            'mandatory' => 'TRUE',
+            'validation' => '.*'
+        )
+    );
+
     public function create() {
 
         if ($GLOBALS['config']->use_cache) {
@@ -16,21 +26,6 @@ class Product_rux extends Product {
         }
     }
 
-    public function options() {
-        $this->provider_options = array (
-            'name' => array (
-                'displayname' => 'name to use in frontend',
-                'description' => 'description of option',
-                'defaultvalue' => 'a default',
-                'value' => 'actualvalue',
-                'mandatory' => TRUE|FALSE,
-                'visible' => TRUE|FALSE,
-                'indexorder' => 0,
-                'validation' => 'regex'
-            )
-        );
-    }
-    
     public function read($id) {
 
         if (!empty($id) and addslashes($id) == $id) {
@@ -52,13 +47,19 @@ class Product_rux extends Product {
                 );
 
                 $result = $adsl_service->call_method($profilefind_obj);
+                if ($result['responseCode'] == VoxADSL::FAILED)
+                    throw new Exception("Error encountered finding profile by id: " . $result['message']);
+                if (empty($result['accountProfile']))
+                    throw new Exception("Product not found");
                 if ($GLOBALS['config']->use_cache) {
                     $cache->save($result);
                 }
             }
             //var_dump($result);
+            if (empty($result['accountProfile']))
+                throw new Exception("Product not found");
             $this->id = $result['accountProfile']['id'];
-            $this->reference = $result['accountProfile']['id'];
+            $this->productId = $this->id;
             $this->name = $result['accountProfile']['name'];
             $this->description = $result['accountProfile']['name'];
             $this->owner = $result['accountProfile']['systemId'];
@@ -82,6 +83,20 @@ class Product_rux extends Product {
             $cache->identifier = 'Datapro';
             $cache->expire();
         }
+    }
+
+    public static function options() {
+        return array(
+            'bundlesize' => array(
+                'description' => 'Bundle Size',
+                'defaultvalue' => '',
+                'value' => NULL,
+                'mandatory' => TRUE,
+                'immutable' => array(),
+                'validation' => array('regex' => '^[0-9]*$', 'class' => 'number'),
+                'hint' => 'Size of traffic bundle in GB'
+            )
+        );
     }
 
 }
@@ -111,6 +126,8 @@ class ProductList_rux extends ProductList {
             );
 
             $result = $adsl_service->call_method($profilefind_obj);
+            if ($result['responseCode'] == VoxADSL::FAILED)
+                throw new Exception("Error encountered geting profile list: " . $result['message']);
             //var_dump($result);
             foreach ($result['accountProfiles'] as $profile) {
                 $product = ProductFactory::Create();
