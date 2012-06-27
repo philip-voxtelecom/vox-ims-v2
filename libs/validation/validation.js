@@ -283,5 +283,8 @@ Validation.addAllThese([
 			}],
 	['validate-phone', 'Please enter a phone number in a format like 0831234567', function(v) {
 				return Validation.get('IsEmpty').test(v) ||  /^\s*(\d{10})?\s*(,\d{10}){0,2}\s*$/.test(v)
-			}]
+			}],
+        ['validate-username', 'Username is unavailable', function(v) {
+				return Validation.get('IsEmpty').test(v) || /^available$/.test(v);
+			}],
 ]);

@@ -130,7 +130,10 @@ jQuery.noConflict();
     });
 })(jQuery);
 
+
 function initLoading() {
+    //xajax.loadingFunction = showLoading;
+    //xajax.doneLoadingFunction = hideLoading;
     xajax.callback.global.onRequest = function()
     {
         xajax.$('loading').style.display = 'block';
@@ -139,6 +142,7 @@ function initLoading() {
     {
         xajax.$('loading').style.display = 'none';
     };
+    
 }
 
 function ismaxlength(obj){
