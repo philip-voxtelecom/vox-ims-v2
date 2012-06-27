@@ -9,22 +9,22 @@ abstract class Product {
     protected $dbh = null;
     protected $id = null;
     protected $null_members = array(
-        'reference' => '__EMPTY_',
         'status' => '__EMPTY_',
         'name' => '__EMPTY_',
         'description' => '__EMPTY_',
         'owner' => '__EMPTY_',
+        'productId' => '__EMPTY_',
     );
     protected $members = array();
-    protected $provider_options = array();
+    protected static $provider_options = array();
 
-    public function __sleep()
-    {
+    public function __sleep() {
         return array('id', 'null_members', 'members', 'provider_options');
     }
-    
+
     public function __wakeup() {
-        $this->dbh = MetaDatabaseConnection::get('product')->handle();;
+        $this->dbh = MetaDatabaseConnection::get('product')->handle();
+        ;
     }
 
     public function __set($name, $value) {
@@ -72,8 +72,6 @@ abstract class Product {
         $this->dbh = MetaDatabaseConnection::get('product')->handle();
         $this->members = $this->null_members;
     }
-    
-
 
     abstract public function create();
 

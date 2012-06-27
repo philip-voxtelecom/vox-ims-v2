@@ -1,7 +1,7 @@
 <?php
 
 include '_common_view.php';
-require_once('_db.php');
+require_once('_meta_db.php');
 
 function Error($errormsg) {
     $view = new Error($errormsg);
@@ -76,8 +76,8 @@ function logout() {
     exit;
 }
 
-function encrypt($str) {
-    $key = $GLOBALS['config']->secretkey;
+function encrypt($str, $key) {
+    $result = '';
     for ($i = 0; $i < strlen($str); $i++) {
         $char = substr($str, $i, 1);
         $keychar = substr($key, ($i % strlen($key)) - 1, 1);
@@ -87,10 +87,9 @@ function encrypt($str) {
     return base64_encode($result);
 }
 
-function decrypt($str) {
+function decrypt($str, $key) {
     $str = base64_decode($str);
     $result = '';
-    $key = $GLOBALS['config']->secretkey;
     for ($i = 0; $i < strlen($str); $i++) {
         $char = substr($str, $i, 1);
         $keychar = substr($key, ($i % strlen($key)) - 1, 1);
@@ -114,6 +113,20 @@ function append_simplexml(&$simplexml_to, &$simplexml_from) {
 function load_provider_model($model) {
     if (file_exists($GLOBALS['documentroot'] . '/Models/' . $GLOBALS['module'] . '/' . $GLOBALS['config']->provider . '/_' . $model . '_model.php')) {
         include($GLOBALS['documentroot'] . '/Models/' . $GLOBALS['module'] . '/' . $GLOBALS['config']->provider . '/_' . $model . '_model.php');
+    }
+}
+
+function load_view($view) {
+    if (file_exists($GLOBALS['documentroot'] . '/Views/' . $GLOBALS['module'] . '/' . $GLOBALS['config']->view . '/_' . $view . '_view.php')) {
+        include($GLOBALS['documentroot'] . '/Views/' . $GLOBALS['module'] . '/' . $GLOBALS['config']->view . '/_' . $view . '_view.php');
+    }
+}
+
+function validateParams($mask, $parameters) {
+
+    foreach ($mask as $name => $option) {
+        if ($option['mandatory'] and empty($parameters[$name]))
+            throw new InvalidArgumentException($name);
     }
 }
 

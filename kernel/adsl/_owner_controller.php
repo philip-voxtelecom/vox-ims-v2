@@ -6,20 +6,18 @@ if (!$GLOBALS['auth']->checkAuth('adsl', AUTH_READ))
 require_once('_owner_model.php');
 require_once('_owner_view.php');
 
-function displayOwnerList() {
-    $arg_list = func_get_args();
-
-    $ownerList = OwnerListFactory::Create();
-    $ownerList->getList();
-
-    $viewobject = new SimpleXMLElement('<root/>');
-    $data = $viewobject->addChild('data');
-    foreach ($ownerList->getList() as $owner) {
-        append_simplexml($data, $owner->asXML());
+class OwnerController {
+    public function create() {
+        
     }
-
-    $view = ownerListViewFactory::Create($viewobject->asXML());
-    return $view->display();
+    
+    public function update() {
+        
+    }
+    
+    public function delete() {
+        
+    }
 }
 
 ?>

@@ -105,7 +105,6 @@ abstract class Owner {
                 $result = $this->dbh->query($query);
                 $row = $result->fetch_assoc();
             }
-
             if (!empty($row)) {
                 $this->id = $row['id'];
                 $this->login = $row['login'];
@@ -173,6 +172,10 @@ abstract class Owner {
      * return the owner login Id
      */
 
+    public function members() {
+        return $this->members;
+    }
+    
     public function getId() {
         return $this->id;
     }

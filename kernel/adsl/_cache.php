@@ -6,7 +6,7 @@ abstract class Cache {
     public $type;
     public $provider;
     public $identifier;
-    public $expirytime = 14400;
+    public $expirytime = 460800;
 
     function getData() {
         if (!isset($this->data))
@@ -108,6 +108,7 @@ class Cache_mysqli extends Cache {
         if (!$result) {
             throw new Exception("Could not load cache");
         }
+
         $row = $result->fetch_assoc();
         if (!empty($row)) {
             $cachetime = strtotime($row['cachetime']);
