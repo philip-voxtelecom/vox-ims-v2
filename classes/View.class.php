@@ -39,7 +39,7 @@ abstract class View {
         }
     }
 
-    abstract protected function display();
+    abstract protected function display($viewarray = NULL);
 
     /**
      *
@@ -48,7 +48,7 @@ abstract class View {
     public function setModule($module) {
         if (isset($module) and file_exists($GLOBALS['documentroot'] . '/templates/' . $module . '/' . $GLOBALS['config']->view)) {
             $this->module = $module;
-            $this->smarty->template_dir = $GLOBALS['documentroot'] . '/templates/' . $this->module . '/' . $GLOBALS['config']->view;
+            $this->smarty->template_dir = $GLOBALS['documentroot'] . '/templates/' . $module . '/' . $GLOBALS['config']->view;
         } else {
             $this->module = NULL;
             $this->smarty->template_dir = $GLOBALS['documentroot'] . $this->default_template;
