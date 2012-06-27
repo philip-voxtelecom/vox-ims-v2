@@ -2,33 +2,43 @@
 
 require_once 'testADSLInit.php';
 
-$owner = OwnerFactory::Create('rux');
 
+$owner = OwnerFactory::Create();
 $owner->login = "TEST_001";
 $owner->password = "aPassword";
-$owner->create();
 print "*** Create\n\n";
-var_dump($owner);
+$owner->create();
 
-
-$owner->read('TEST_001');
 print "*** Read\n\n";
-var_dump($owner);
+$owner->read('TEST_001');
 
+//var_dump($owner);
+
+print $owner->asXML();
 $owner->password='aNewPassword';
 $owner->name="My company";
-$owner->update();
 print "*** Update\n\n";
-var_dump($owner);
+$owner->update();
+//var_dump($owner);
 
-$ownerList = OwnerListFactory::Create('rux');
-print "*** Owner List\n\n";
-var_dump($ownerList);
+print "\n*** Owner List\n";
+$ownerList = OwnerListFactory::Create();
+//var_dump($ownerList);
 
+print "\n*** Display\n";
+$view = OwnerViewFactory::Create();
+echo json_encode($view->listall());
+//displayOwnerList();
+
+print "\n*** Delete\n";
 $owner->delete();
-print "*** Delete\n\n";
-var_dump($owner);
+//var_dump($owner);
 
+print "\n*** Realms ***\n";
+$owner = OwnerFactory::Create();
+$owner->read('Datapro');
+
+var_dump($owner->getRealms());
 return;
 
 ?>

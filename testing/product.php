@@ -11,8 +11,9 @@ var_dump($product);
  * 
  */
 
-$productlist = ProductListFactory::Create();
-var_dump($productlist);
+//$productlist = ProductListFactory::Create();
+$view = ProductViewFactory::Create();
+echo json_encode($view->listall());
 
 return;
 ?>

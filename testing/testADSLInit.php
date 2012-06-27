@@ -13,6 +13,7 @@ $auth = new Auth('philip');
 define('AUTH', true);
 $_SESSION['name'] = 'philip';
 include $GLOBALS['documentroot'] . '/configs/config.php';
+$GLOBALS['config']->view = 'NULL';
 
 if (!$GLOBALS['auth']->checkAuth('adsl', AUTH_READ))
     throw new Exception('Access Denied');
@@ -24,5 +25,7 @@ include $GLOBALS['documentroot'] . '/kernel/adsl/_cache.php';
 include $GLOBALS['documentroot'] . '/kernel/adsl/_common_functions.php';
 include $GLOBALS['documentroot'] . '/kernel/adsl/_owner_controller.php';
 include $GLOBALS['documentroot'] . '/kernel/adsl/_product_controller.php';
+include $GLOBALS['documentroot'] . '/kernel/adsl/_account_controller.php';
+include $GLOBALS['documentroot'] . '/kernel/adsl/_usage_controller.php';
 
 ?>

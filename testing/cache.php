@@ -15,14 +15,13 @@ $productlist = ProductListFactory::Create();
 var_dump($productlist);
 
 /*
-$cache = new Cache();
+$cache = CacheFactory::Create();
 $cache->type = 'profilelist';
 $cache->provider = 'rux';
 $cache->identifier = 'datapro';
 
 $cache->expire();
- * 
- */
+*/
 
 
 
