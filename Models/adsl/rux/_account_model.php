@@ -18,14 +18,14 @@ class Account_rux extends Account {
         $loginId = $GLOBALS['login']->getLoginId();
 
         $this->ownerObj = OwnerFactory::Create();
-        if ($this->ownerObj->read($loginId) != $loginId)
+        if ($this->ownerObj->getByLogin($loginId) != $loginId)
             throw new Exception("Owner not verified");
 
         $this->productObj = ProductFactory::Create();
         $this->productObj->read($this->product);
 
         $createObj = array(
-            'callingSystemId' => $this->ownerObj->getId(),
+            'callingSystemId' => $this->ownerObj->login,
             'callingSystemReference' => (isset($this->systemReference) ? $this->systemReference : 'UNKNOWN'),
             'userName' => $this->username,
             'password' => $this->password,

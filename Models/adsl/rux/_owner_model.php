@@ -14,7 +14,8 @@ class Owner_rux extends Owner {
 
         // TODO check if the user exists on rux
         $check = OwnerFactory::Create();
-        if ($check->read($this->login) == $this->login) {
+        $check->getByLogin($this->login);
+        if ($check->login == $this->login) {
             throw new Exception("$this->login already exists");
         }
         $adsl_service = new VoxADSL();
@@ -28,13 +29,17 @@ class Owner_rux extends Owner {
             throw new Exception("$this->login already exists");
         unset($check);
 
-        $query = "insert into owners(id,login,password,primaryemail,name,status,comments)
-                      values ('$this->login','$this->login','$this->password','$this->primaryemail','$this->name','$this->status','$this->comments')";
+        isset($this->primaryemail)?$primaryemail=$this->primaryemail:$primaryemail='';
+        isset($this->name)?$name=$this->name:$name='';
+        isset($this->comments)?$comments=$this->comments:$comments='';
+        
+        $query = "insert into owners(login,password,primaryemail,name,comments)
+                      values ('$this->login','$this->password','$primaryemail','$name','$comments')";
         $result = $this->dbh->query($query);
         if (!$result) {
-            throw new Exception("Could not add owner details");
+            throw new Exception("Could not add owner details: ".$this->dbh->error);
         }
-        $this->id = $this->login;
+        $this->id = $this->dbh->insert_id;
         return TRUE;
     }
 

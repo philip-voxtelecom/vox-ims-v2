@@ -11,15 +11,7 @@ abstract class Owner {
     /*
      * owner properties
      */
-    protected $id = null;
-    protected $null_members = array(
-        'login' => '__EMPTY_',
-        'password' => '__EMPTY_',
-        'primaryemail' => '__EMPTY_',
-        'status' => '__EMPTY_',
-        'comments' => '__EMPTY_',
-        'name' => '__EMPTY_'
-    );
+    protected $id = NULL;
     protected $members = array();
     /*
      * associated owner lists
@@ -28,7 +20,7 @@ abstract class Owner {
     protected $productList;
 
     public function __sleep() {
-        return array('id', 'null_members', 'members');
+        return array('id', 'members', 'login');
     }
 
     public function __wakeup() {
@@ -37,20 +29,13 @@ abstract class Owner {
     }
 
     public function __set($name, $value) {
-        if (isset($this->members[$name])) {
-            $this->members[$name] = $value;
-        } else {
-            throw new Exception("Attempting to set non-existent member");
-        }
+        $this->members[$name] = $value;
     }
 
     public function __get($name) {
-        if (array_key_exists($name, $this->members) and $this->members[$name] != '__EMPTY_') {
+        if (array_key_exists($name, $this->members)) {
             return $this->members[$name];
-        } elseif (array_key_exists($name, $this->members) and $this->members[$name] == '__EMPTY_') {
-            return NULL;
         }
-
         $trace = debug_backtrace();
         trigger_error(
                 'Undefined property via __get(): ' . $name .
@@ -60,32 +45,21 @@ abstract class Owner {
     }
 
     public function __isset($name) {
-        if (isset($this->members[$name]) and $this->members[$name] != '__EMPTY_') {
-            return TRUE;
-        } elseif (isset($this->members[$name]) and $this->members[$name] == '__EMPTY_') {
-            return FALSE;
-        } else {
-            throw new Exception("Attempting to access non-existent member");
-        }
+        return isset($this->members[$name]);
     }
 
     public function __unset($name) {
-        if (isset($this->members[$name])) {
-            unset($this->members[$name]);
-        } else {
-            throw new Exception("Attempting to delete non-existent member");
-        }
+        unset($this->members[$name]);
     }
 
     function __construct() {
         $this->dbh = MetaDatabaseConnection::get('owner')->handle();
-        $this->members = $this->null_members;
     }
 
     abstract public function create();
 
     public function read($id) {
-        $this->members = $this->null_members;
+        $this->members = array();
         $this->id = NULL;
         if (!empty($id) and addslashes($id) == $id) {
             $query = "select * from owners where id='$id'";
@@ -104,8 +78,10 @@ abstract class Owner {
                 $this->status = $row['status'];
                 $this->comments = $row['comments'];
             }
-            return $this->id;
+            if (!empty($this->id))
+                return $this->id;
         }
+        $this->login = NULL;
         return FALSE;
     }
 
@@ -148,17 +124,13 @@ abstract class Owner {
                 throw new Exception("Could not delete owner");
             }
             $this->id = NULL;
-            $this->members = $this->null_members;
+            $this->members = array();
             return TRUE;
         } else {
             throw new Exception('No owner instantiated for deletion');
         }
         return FALSE;
     }
-
-    /*
-     * return the owner login Id
-     */
 
     public function members() {
         return $this->members;
@@ -168,9 +140,32 @@ abstract class Owner {
         return $this->id;
     }
 
-    /*
-     * returns a collection of this owner's products
-     */
+    public function getByLogin($id) {
+        $this->members = array();
+        $this->id = NULL;
+        if (!empty($id) and addslashes($id) == $id) {
+            $query = "select * from owners where login='$id'";
+            if ($GLOBALS['config']->adsl_meta_dbtype == 'mysqli') {
+                $result = $this->dbh->query($query);
+                $row = $result->fetch_assoc();
+            } else {
+                throw new Exception("Unsupported DB type for adsl_meta_dbtype");
+            }
+            if (!empty($row)) {
+                $this->id = $row['id'];
+                $this->login = $row['login'];
+                $this->password = $row['password'];
+                $this->primaryemail = $row['primaryemail'];
+                $this->name = $row['name'];
+                $this->status = $row['status'];
+                $this->comments = $row['comments'];
+            }
+            if (!empty($this->login))
+                return $this->login;
+        }
+        $this->login = NULL;
+        return FALSE;
+    }
 
     public function getProductList() {
         if (empty($this->productList)) {
@@ -182,10 +177,6 @@ abstract class Owner {
         }
         return $this->productList;
     }
-
-    /*
-     * returns a collection of owners user objects
-     */
 
     public function getUserList() {
         if (empty($this->userList)) {
