@@ -1,5 +1,7 @@
 <?php
 
+require_once '_vox_adslservices.php';
+
 class Owner_rux extends Owner {
 
     public function create() {
@@ -15,6 +17,15 @@ class Owner_rux extends Owner {
         if ($check->read($this->login) == $this->login) {
             throw new Exception("$this->login already exists");
         }
+        $adsl_service = new VoxADSL();
+        $adsl_service->loadMethod('account','findbysystemid');
+        $check = $adsl_service->call_method(array('systemId' => $this->login));
+        if (isset($check['accounts']))
+            throw new Exception("$this->login already exists");
+        $adsl_service->loadMethod('profile','findbysystemid');
+        $check = $adsl_service->call_method(array('systemId' => $this->login));
+        if (isset($check['accountProfiles']))
+            throw new Exception("$this->login already exists");
         unset($check);
 
         $query = "insert into owners(id,login,password,primaryemail,name,status,comments)
@@ -27,21 +38,7 @@ class Owner_rux extends Owner {
         return TRUE;
     }
 
-    public function getRealms() {
 
-        if (!isset($this->id))
-            throw new Exception("No owner object loaded");
-        $query = "select realm, status from realms a, ownerRealm b where b.owner_id='$this->id' and a.id=b.realm_id";
-        $result = $this->dbh->query($query);
-        if (!$result) {
-            throw new Exception("Could not get owner realms");
-        }
-        $realms = array();
-        while ($row = $result->fetch_assoc()) {
-            $realms[] = $row;
-        }
-        return $realms;
-    }
 
 }
 
