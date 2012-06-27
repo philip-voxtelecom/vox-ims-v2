@@ -100,8 +100,12 @@ function decrypt($str, $key) {
 }
 
 function append_simplexml(&$simplexml_to, &$simplexml_from) {
-    
-    if (!(get_class($simplexml_to) == "SimpleXMLElement" and get_class($simplexml_from) == "SimpleXMLElement"))
+
+    if (!(
+            (get_class($simplexml_to) == "SimpleXMLElement" or get_parent_class($simplexml_to) == "SimpleXMLElement")
+            and (get_class($simplexml_from) == "SimpleXMLElement" or get_parent_class($simplexml_from) == "SimpleXMLElement")
+            )
+    )
         throw new Exception("Not a SimpleXMLElement object");
     foreach ($simplexml_from->children() as $simplexml_child) {
         $simplexml_temp = $simplexml_to->addChild($simplexml_child->getName(), htmlspecialchars((string) $simplexml_child));
