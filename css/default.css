@@ -31,7 +31,7 @@
     width: 800px;
     padding: 0px;
     margin: 0px;
-    background-color: red;
+    background-color: #990000;
 }
 #error_close {
     float: right;
@@ -120,8 +120,9 @@
     padding: 1px 3px;
 }
 .selected_row {
-    background-color: #8A0000;
+    background-color: #EB7305;
     color: #FFFFFF;
+    font-weight: bold;
 }
 
 html, body {
@@ -129,13 +130,13 @@ html, body {
     width: 800px;
     padding: 3px 15px 0px 0px;
     background-image: url(http://www.interprise.co.za/images/main_images/Background.gif);
-    background-color: #000066;
+    background-color: #031E31;
     font-family: "Ariel", sans-serif;
     margin: auto;
 }
 
 .logo {
-    background-image: url(/css/images/iprise-logo.JPG);
+    background-image: url(/css/images/vox-logo.gif);
     height: 50px;
 }
 
@@ -151,22 +152,22 @@ html, body {
     clear: both;
 }
 .clearFix:after { /* for modern browsers */
-                  content:".";
-                  display:block;
-                  height:0;
-                  clear:both;
-                  visibility:hidden;
-                  overflow:hidden;
+    content:".";
+    display:block;
+    height:0;
+    clear:both;
+    visibility:hidden;
+    overflow:hidden;
 }
 .clearFix { /* for IE7/Win */
-            min-height:1px;
+    min-height:1px;
 }
 * html .clearFix { /* for IE5-6/Win */
-                   height:1px;
+    height:1px;
 }
 * html>body .clearFix { /* for IE5/Mac */
-                        height:auto;
-                        display:inline-block;
+    height:auto;
+    display:inline-block;
 }
 
 .visible {
@@ -178,7 +179,7 @@ html, body {
 }
 
 .titleLabel {
-    background-color:#8A0000;
+    background-color:#031E31;
     color: #FFFFFF;
     margin-top: 20px;
     margin-bottom: 5px;
@@ -221,4 +222,10 @@ html, body {
 
 .noprint {
     color: silver;
+}
+
+.center 
+{
+    margin-left:auto;
+    margin-right:auto;
 }
