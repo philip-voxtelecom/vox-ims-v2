@@ -10,7 +10,7 @@ class initPageView_ims extends View {
         parent::__construct($viewobject);
     }
     
-    public function display() {
+    public function display($viewarray = NULL) {
         $menulist = '
           <ul id="Menu2" class="MM" style="margin: auto;">
       ';
@@ -24,14 +24,18 @@ class initPageView_ims extends View {
          */
         if ($GLOBALS['auth']->checkAuth('adsl_accountlist', AUTH_READ)) {
             $menulist = $menulist . '
-           <li><a href="#" onclick="window.prevline = null; xajax_displayAccountList(\'%\',0);">Accounts</a></li>
+           <li><a href="#" onclick="window.prevline = null; xajax_accountView(\'listall\',{offset:0,limit:20});">Accounts</a></li>
          ';
         }
+        
+        /*
         if ($GLOBALS['auth']->checkAuth('adsl_account', AUTH_READ)) {
             $menulist = $menulist . '
            <li><a href="#" onclick="xajax_ownerReportDisplay();">Reports</a></li>
          ';
         }
+         * 
+         */
         /*
         if ($GLOBALS['auth']->checkAuth('adsl_owner', AUTH_CREATE)) {
             $menulist = $menulist . '
@@ -43,12 +47,12 @@ class initPageView_ims extends View {
         
         if ($GLOBALS['auth']->checkAuth('adsl_owner', AUTH_READ)) {
             $menulist = $menulist . '
-           <li><a href="#" onclick="xajax_displayOwnerList(\'%\',0);">Owners</a></li>
+           <li><a href="#" onclick="xajax_ownerView(\'listall\',{});">Owners</a></li>
          ';
         }
         if ($GLOBALS['auth']->checkAuth('adsl_product', AUTH_READ)) {
             $menulist = $menulist . '
-           <li><a href="#" onclick="xajax_displayProductList(\'%\',0);">Products</a></li>
+           <li><a href="#" onclick="xajax_productView(\'listall\',{});">Products</a></li>
          ';
         }
         $this->smarty->assign('menulist', $menulist);

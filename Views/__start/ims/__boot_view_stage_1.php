@@ -9,7 +9,7 @@ $xajax->configure('javascript URI', '/libs/xajax/');
 
 class _bootView extends View {
 
-    public function display() {
+    public function display($viewarray = NULL) {
         if (!file_exists($this->smarty->template_dir . '/__start.tpl')) {
             $this->setModule(NULL);
         }
@@ -35,7 +35,7 @@ class _bootView extends View {
             $this->smarty->assign('VERSION', $GLOBALS['config']->VERSION);
             $this->smarty->assign('xajax_javascript', $this->viewobject['xajax']);
             $this->smarty->assign('content', '
-                <br/>Welcome to the Interprise Management System.<br/><br/>
+                <br/>Welcome to the Internet Management System.<br/><br/>
                 Select a service from the menu to start<p></p>
            ');
         }

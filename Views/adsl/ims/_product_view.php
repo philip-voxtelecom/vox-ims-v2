@@ -4,31 +4,29 @@
  * ims _product_class view
  */
 
-$xajax->registerFunction("displayProductList");
+$xajax->registerFunction("productView");
 
-class productListView_ims extends View {
+function productView($viewrequest, $viewarray) {
+    $view = new ProductView_ims();
+    if (method_exists($view, $viewrequest))
+        return call_user_func_array(array($view, $viewrequest), $viewarray);
+}
+
+class ProductView_ims extends ProductView {
 
     protected $xajax;
 
-    public function __construct($viewobject) {
+    public function __construct($viewobject = null) {
         $this->xajax = new xajaxResponse();
         parent::__construct($viewobject);
     }
 
-    public function display() {
+    public function display($viewarray = NULL) {
+        ;
+    }
 
-        $xml = new ViewObject($this->viewobject);
-        $products = array();
-
-        foreach ($xml->data->children() as $element) {
-            $id = (string) $element->id;
-            $product = array();
-            foreach ($element->children() as $param) {
-                $product[$param->getName()] = (string) $param;
-            }
-            array_push($products, $product);
-                    
-        }
+    public function listall() {
+        $products = parent::listall();
 
         $this->smarty->assign("products", $products);
         $this->smarty->assign("count", '1');
@@ -41,7 +39,6 @@ class productListView_ims extends View {
         $this->xajax->assign("content", "innerHTML", $productlist);
         $this->xajax->assign("right_bar", "innerHTML", $productlistbar);
         return $this->xajax;
-
     }
 
 }
