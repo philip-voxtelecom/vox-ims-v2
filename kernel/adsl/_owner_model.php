@@ -221,7 +221,22 @@ abstract class Owner {
         }
         return $xml;
     }
+    
+    public function getRealms() {
 
+        if (!isset($this->id))
+            throw new Exception("No owner object loaded");
+        $query = "select realm, status from realms a, ownerRealm b where b.owner_id='$this->id' and a.id=b.realm_id";
+        $result = $this->dbh->query($query);
+        if (!$result) {
+            throw new Exception("Could not get owner realms");
+        }
+        $realms = array();
+        while ($row = $result->fetch_assoc()) {
+            $realms[] = $row;
+        }
+        return $realms;
+    }
 }
 
 class OwnerList {
