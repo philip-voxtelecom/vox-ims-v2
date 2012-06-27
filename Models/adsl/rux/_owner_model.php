@@ -40,7 +40,7 @@ class Owner_rux extends Owner {
             throw new Exception("Could not add owner details: ".$this->dbh->error);
         }
         $this->id = $this->dbh->insert_id;
-        return TRUE;
+        return $this->id;
     }
 
 }
