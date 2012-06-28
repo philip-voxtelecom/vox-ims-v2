@@ -85,20 +85,28 @@ abstract class Owner {
         return FALSE;
     }
 
-    public function update() {
+    public function update($parameters) {
         if (empty($this->id))
             throw new Exception("Owner not loaded for update");
+
+        foreach ($parameters as $parameter => $value) {
+            $this->$parameter = $value;
+        }
+
         if (!isset($this->password))
             throw new Exception("owner update requires password to be set");
-        if (!isset($this->status))
-            $this->status = 'active';
+
+        isset($this->primaryemail) ? $primaryemail = $this->primaryemail : $primaryemail = '';
+        isset($this->name) ? $name = $this->name : $name = '';
+        isset($this->comments) ? $comments = $this->comments : $comments = '';
+        isset($this->status) ? $status = $this->status : $status = 'active';
 
         $query = "update owners set 
                     password='$this->password',
-                    primaryemail='$this->primaryemail',
-                    name='$this->name',
-                    status='$this->status',
-                    comments='$this->comments'
+                    primaryemail='$primaryemail',
+                    name='$name',
+                    status='$status',
+                    comments='$comments'
                   where id='$this->id'
                 ";
         if ($GLOBALS['config']->adsl_meta_dbtype == 'mysqli') {
@@ -135,7 +143,14 @@ abstract class Owner {
         return $this->members;
     }
 
-    public function getId() {
+    /*
+      public function getId() {
+      return $this->id;
+      }
+     * 
+     */
+
+    public function id() {
         return $this->id;
     }
 
@@ -164,28 +179,6 @@ abstract class Owner {
         }
         $this->login = NULL;
         return FALSE;
-    }
-
-    public function getProductList() {
-        if (empty($this->productList)) {
-            try {
-                // TODO 
-            } catch (Exception $e) {
-                throw new Exception("Error in owner::getProductList" . $e->getMessage());
-            }
-        }
-        return $this->productList;
-    }
-
-    public function getUserList() {
-        if (empty($this->userList)) {
-            try {
-                // TODO
-            } catch (Exception $e) {
-                throw new Exception("Error in owner::getUserList" . $e->getMessage());
-            }
-        }
-        return $this->userList;
     }
 
     public function asXML() {
@@ -222,13 +215,15 @@ class OwnerList {
 
     protected $list = NULL;
     protected $dbh;
+    protected $countall;
+    protected $count;
 
     function __construct() {
         $this->dbh = MetaDatabaseConnection::get('ownerlist')->handle();
         return $this->getList();
     }
 
-    public function getList() {
+    public function getList($offset = 0, $limit = 0, $searchkey = '.*') {
         if (empty($this->list)) {
             $this->list = new Collection();
             $query = "select id from owners order by id";
@@ -246,6 +241,20 @@ class OwnerList {
                 throw new Exception("Unsupported DB type for adsl_meta_dbtype");
             }
         }
+        $this->countall = $this->list->count();
+        $orderedlist = array();
+        $newlist = array();
+        foreach ($this->list->getAll() as $value) {
+            if (
+                    preg_match("/$searchkey/i", $value->login) or
+                    preg_match("/$searchkey/i", isset($value->name) ? $value->name : '')
+            )
+                $orderedlist[$value->login] = $value;
+        }
+        ksort($orderedlist);
+        foreach ($orderedlist as $key => $value)
+            array_push($newlist, $value);
+        $this->list = new Collection($newlist);
         return $this->list;
     }
 
