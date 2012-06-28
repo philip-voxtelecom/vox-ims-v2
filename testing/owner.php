@@ -2,15 +2,17 @@
 
 require_once 'testADSLInit.php';
 
-
+/*
 $owner = OwnerFactory::Create();
+
 $owner->login = "TEST_001";
 $owner->password = "aPassword";
 print "*** Create\n\n";
 $owner->create();
 
+
 print "*** Read\n\n";
-$owner->read('TEST_001');
+$owner->getByLogin('TEST_001');
 
 //var_dump($owner);
 
@@ -36,9 +38,27 @@ $owner->delete();
 
 print "\n*** Realms ***\n";
 $owner = OwnerFactory::Create();
-$owner->read('Datapro');
+$owner->getByLogin('Datapro');
 
 var_dump($owner->getRealms());
 return;
+ * 
+ */
+
+$owner = new OwnerController();
+
+print "*** Create\n\n";
+$id = $owner->create(array('login' => 'TEST_001', 'password' => 'oldpassword'));
+
+print "*** Update\n\n";
+$owner->update(array('password' => 'newpassword', 'primaryemail' => 'this@an.tld'));
+
+print "*** Read\n\n";
+$owner->read($id);
+
+print_r($owner);
+
+print "\n*** Delete\n";
+$owner->delete();
 
 ?>
