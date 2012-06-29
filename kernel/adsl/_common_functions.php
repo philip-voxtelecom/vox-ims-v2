@@ -52,21 +52,20 @@ function humanify_s() {
     return sprintf("%dd %02dh %02dm %02ds", $days, $hours, $mins, $secs);
 }
 
-function audit() {
-    $arg_list = func_get_args();
-    $dbh = DatabaseConnection::get()->handle();
-    $authuser = array_shift($arg_list);
-    $identifier = array_shift($arg_list);
-    $facility = array_shift($arg_list);
-    $action = array_shift($arg_list);
-    $parameter = array_shift($arg_list);
-    $oldValue = array_shift($arg_list);
-    $newValue = addslashes(array_shift($arg_list));
-    $query = "INSERT INTO audit(authuser,facility,action,parameter,identifier,oldvalue,newvalue,auditdate) VALUES ('$authuser','$facility','$action','$parameter','$identifier','$oldValue','$newValue',current_timestamp)";
+function audit($facility,$action,$parameter = NULL, $timing = NULL) {
+    $dbh = MetaDatabaseConnection::get('audit')->handle();
+    $authuser = $GLOBALS['loginUser'];
+    $version = $GLOBALS['config']->VERSION;
+    $parameter = serialize($parameter);
+    $query = "INSERT INTO audit(authuser,facility,action,version,parameter,timing) VALUES ('$authuser','$facility','$action','$version','$parameter','$timing')";
     //error_log($query);
-    pg_query($dbh, "begin");
-    pg_query($dbh, $query);
-    pg_query($dbh, "commit");
+    if ($GLOBALS['config']->adsl_meta_dbtype == 'mysqli') {
+        $result = $dbh->query($query);
+        if(empty($result))
+            throw new Exception("Error writing to audit: ".$dbh->error);
+    } else {
+        throw new Exception("Unsupported DB type for adsl_meta_dbtype");
+    }
 }
 
 function logout() {
