@@ -204,6 +204,14 @@ class AccountController {
             $this->account = AccountFactory::Create();
         return $this->account->options();
     }
+    
+    public function authenticate($password) {
+        if (empty($this->account))
+            throw new Exception("Cannot authenticate unloaded account");
+        if (encrypt($password, $this->account->username) == $this->account->_accesskey_)
+                return TRUE;
+        return FALSE;
+    }
 
 }
 
