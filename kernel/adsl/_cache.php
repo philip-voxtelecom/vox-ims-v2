@@ -72,7 +72,7 @@ class Cache_pdodb extends Cache {
         unset($cached);
         $result = $sth->execute(array('data' => $this->data, 'type' => $this->type, 'provider' => $this->provider, 'identifier' => $this->identifier));
         if (!$result) {
-            throw new Exception("Could not save cache ");
+            throw new Exception("Could not save cache: ");
         }
         return TRUE;
     }
@@ -140,7 +140,7 @@ class Cache_mysqli extends Cache {
         unset($cached);
         $result = $this->dbh->query($query);
         if (!$result) {
-            throw new Exception("Could not save cache ");
+            throw new Exception("Could not save cache: ".$this->dbh->error);
         }
         return TRUE;
     }
