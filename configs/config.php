@@ -4,7 +4,7 @@ require $GLOBALS['documentroot'] . '/classes/Config.class.php';
 
 $config = new Config();
 
-$config->VERSION = '0.9.1';
+$config->VERSION = '0.9.2';
 $config->debug = TRUE;
 
 // ADSL system this system is interacting with
