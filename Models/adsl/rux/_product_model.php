@@ -4,16 +4,6 @@ require_once('_vox_adslservices.php');
 
 class Product_rux extends Product {
 
-    protected static $provider_options = array(
-        'bundle' => array(
-            'description' => 'Bundle Size',
-            'defaultvalue' => '0',
-            'value' => NULL,
-            'mandatory' => 'TRUE',
-            'validation' => '.*'
-        )
-    );
-
     public function create() {
 
         if ($GLOBALS['config']->use_cache) {
