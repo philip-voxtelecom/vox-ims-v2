@@ -25,7 +25,6 @@ abstract class Owner {
 
     public function __wakeup() {
         $this->dbh = MetaDatabaseConnection::get('owner')->handle();
-        ;
     }
 
     public function __set($name, $value) {
