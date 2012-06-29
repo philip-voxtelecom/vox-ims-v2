@@ -44,7 +44,18 @@ class AccountView_ims extends AccountView {
         $this->smarty->assign("search", $this->search);
         $accountlist = $this->smarty->fetch('accountList.tpl');
         $this->smarty->clear_all_assign();
+
+        $viewobject = new ViewObject('<root/>');
+
+        $menu1 = $viewobject->addChild('globalmenu');
+        if ($GLOBALS['auth']->checkAuth('adsl_account', AUTH_CREATE)) {
+            $menuitem = $menu1->addChild('menuitem');
+            $menuitem->addChild('face', 'Create account');
+            $menuitem->addChild('action', "xajax_accountView('create',{});");
+        }
+
         $this->smarty->assign("search", $this->search);
+        $this->smarty->assign("viewobject", $viewobject);
         $accountlistbar = $this->smarty->fetch('accountListMenu.tpl');
         $this->xajax->assign("content", "innerHTML", $accountlist);
         $this->xajax->assign("right_bar", "innerHTML", $accountlistbar);
