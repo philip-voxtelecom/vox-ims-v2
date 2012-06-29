@@ -32,7 +32,9 @@ class Account_rux extends Account {
             'friendlyName' => (isset($this->description) ? $this->description : ''),
             'allowedUsage' => $this->bundlesize,
             'accountProfileId' => $this->productObj->getId(),
-            'isActive' => true
+            'isActive' => true,
+            'radiusClass' => 'N|U|10240|0|0|0|31',
+            'groupEntity' => $this->ownerObj->login
         );
 
         $adsl_service = new VoxADSL();
@@ -46,7 +48,7 @@ class Account_rux extends Account {
         $updateObj = array(
             'accountId' => $this->id,
             'attributeKey' => '_accesskey_',
-            'attributeValue' => encrypt(strtolower($this->username), $this->password),
+            'attributeValue' => encrypt($this->password, strtolower($this->username)),
             'systemInfos' => array()
         );
         $adsl_service->call_method($createObj);
@@ -162,7 +164,7 @@ class Account_rux extends Account {
                         $updateObj = array(
                             'accountId' => $this->id,
                             'attributeKey' => '_accesskey_',
-                            'attributeValue' => encrypt(strtolower($this->username), $value),
+                            'attributeValue' => encrypt($value, strtolower($this->username)),
                             'systemInfos' => array()
                         );
                         $result = $adsl_service->call_method($updateObj);
