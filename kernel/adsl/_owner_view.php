@@ -51,7 +51,7 @@ class OwnerView extends View {
 
     public function realms($id) {
         $owner = OwnerFactory::Create();
-        $owner->read($id);
+        $owner->getByLogin($id);
         return $owner->getRealms();
     }
 }
