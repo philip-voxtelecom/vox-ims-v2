@@ -50,7 +50,15 @@ if ($service->url_elements[2] == 'account') {
                 $id = $service->url_elements[3];
             }
             $account->read($id);
-            $response['reply'] = $account->properties();
+            if (isset($service->parameters['auth'])) {
+                $auth = $account->authenticate($service->parameters['auth']);
+                if (empty($auth)) {
+                    throw new Exception("Username or Password Invalid");
+                }
+                $response['reply'] = true;
+            } else {
+                $response['reply'] = $account->properties();
+            }
             $response['responseCode'] = 'COMPLETED';
         } catch (Exception $e) {
             $response['message'] = $e->getMessage();
