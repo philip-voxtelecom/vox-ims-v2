@@ -16,10 +16,9 @@ abstract class Product {
         'productId' => '__EMPTY_',
     );
     protected $members = array();
-    protected static $provider_options = array();
 
     public function __sleep() {
-        return array('id', 'null_members', 'members', 'provider_options');
+        return array('id', 'null_members', 'members');
     }
 
     public function __wakeup() {
