@@ -58,6 +58,9 @@ class AccountController {
          * note
          * 
          */
+        $time_start = microtime(true);
+        $auditdata = array();
+        array_push($auditdata, $parameters);
 
         $this->account = AccountFactory::Create();
 
@@ -86,28 +89,43 @@ class AccountController {
             throw new Exception("Error creating account: " . $e->getMessage());
         }
         if (isset($parameters['note']))
-            $this->update(array('note' => $parameters['note']));
+            $this->account->update(array('note' => $parameters['note']));
         if (isset($this->account->notifycell))
-            $this->update(array('notifycell' => $this->account->notifycell));
+            $this->account->update(array('notifycell' => $this->account->notifycell));
         if (isset($this->account->notifyemail))
-            $this->update(array('notifyemail' => $this->account->notifyemail));
+            $this->account->update(array('notifyemail' => $this->account->notifyemail));
 
-
+        $time = microtime(true) - $time_start;
+        audit('account', 'create', $auditdata, $time);
         return $this->account->id();
     }
 
     public function read($id) {
+        $time_start = microtime(true);
+        $auditdata = array();
+        array_push($auditdata, $id);
+
+
+
         if (empty($id))
             throw new InvalidArgumentException("Invalid argument");
 
         if (empty($this->account))
             $this->account = AccountFactory::Create();
+
+        $time = microtime(true) - $time_start;
+        audit('account', 'read', $auditdata, $time);
         return $this->account->read($id);
     }
 
     public function update($parameters) {
+        $time_start = microtime(true);
+        $auditdata = array();
+        array_push($auditdata, $parameters);
+
         if (empty($this->account))
             throw new Exception("No account loaded for update");
+        array_push($auditdata, $this->account->id());
 
         $this->account->update($parameters);
         /*
@@ -123,9 +141,15 @@ class AccountController {
          * topup
          * 
          */
+        $time = microtime(true) - $time_start;
+        audit('account', 'update', $auditdata, $time);
+        return TRUE;
     }
 
     public function delete($id = NULL) {
+        $time_start = microtime(true);
+        $auditdata = array();
+
         if (empty($id) and empty($this->account))
             throw new InvalidArgumentException("Invalid argument");
 
@@ -137,6 +161,7 @@ class AccountController {
                 throw new Exception("Could not load account for delete: " . $e->getMessage());
             }
         }
+        array_push($auditdata, $this->account->properties());
 
         try {
             $this->account->delete();
@@ -144,6 +169,9 @@ class AccountController {
         } catch (Exception $e) {
             throw new Exception("Problem encountered deleting account");
         }
+
+        $time = microtime(true) - $time_start;
+        audit('account', 'delete', $auditdata, $time);
         return TRUE;
     }
 
@@ -152,27 +180,50 @@ class AccountController {
          * listall returns an array of accounts
          * 
          */
+        $func_args = func_get_args();
+        $time_start = microtime(true);
+        $auditdata = array();
+        array_push($auditdata, $func_args);
+
 
         $this->list = AccountListFactory::Create();
+
+        $time = microtime(true) - $time_start;
+        audit('account', 'listall', $auditdata, $time);
         return $this->list->getList($offset, $limit, $search)->getAll();
     }
 
     public function findByUsername($username) {
+        $time_start = microtime(true);
+        $auditdata = array();
+        array_push($auditdata, $username);
+
         if (empty($username))
             throw new InvalidArgumentException("Invalid argument");
         if (empty($this->account))
             $this->account = AccountFactory::Create();
         $id = $this->account->findByUsername($username);
 
+        $time = microtime(true) - $time_start;
+        audit('account', 'findByUsername', $auditdata, $time);
         return $id;
     }
 
     public function isUsernameAvailable($username) {
+        $time_start = microtime(true);
+        $auditdata = array();
+        array_push($auditdata, $username);
+
         if (empty($username))
             throw new InvalidArgumentException("Invalid argument");
         if (empty($this->account))
             $this->account = AccountFactory::Create();
-        return $this->account->isUsernameAvailable($username);
+        
+        $result = $this->account->isUsernameAvailable($username);
+        
+        $time = microtime(true) - $time_start;
+        audit('account', 'isUsernameAvailable', $auditdata, $time);
+        return $result;
     }
 
     public function product() {
@@ -204,12 +255,12 @@ class AccountController {
             $this->account = AccountFactory::Create();
         return $this->account->options();
     }
-    
+
     public function authenticate($password) {
         if (empty($this->account))
             throw new Exception("Cannot authenticate unloaded account");
         if (encrypt($password, $this->account->username) == $this->account->_accesskey_)
-                return TRUE;
+            return TRUE;
         return FALSE;
     }
 
