@@ -119,6 +119,12 @@ class ProductList_rux extends ProductList {
             if ($result['responseCode'] == VoxADSL::FAILED)
                 throw new Exception("Error encountered geting profile list: " . $result['message']);
             //var_dump($result);
+            //Fix for single result in collection
+            if (isset($result['accountProfiles']['id'])) {
+                $fix = $result['accountProfiles'];
+                unset($result);
+                $result = array('accountProfiles' => array($fix));
+            }
             foreach ($result['accountProfiles'] as $profile) {
                 $product = ProductFactory::Create();
                 $product->read($profile['id']);
