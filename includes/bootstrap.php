@@ -17,6 +17,7 @@ if (!isset($_SERVER['PHP_AUTH_USER']))
 
     define('AUTH',true);
     $_SESSION['name'] = $_SERVER['PHP_AUTH_USER'];
+    $GLOBALS['loginUser'] = $_SERVER['PHP_AUTH_USER'];
     include $GLOBALS['documentroot'].'/configs/config.php';
 }
 
