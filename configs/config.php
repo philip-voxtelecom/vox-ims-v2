@@ -27,6 +27,7 @@ $config->displayRowLimit = 20;
 //$config->adsl_meta_dbpass = 'y6t5r4e3';
 
 $config->use_cache = TRUE;
+$config->cacheExpiryTime = 14400;
 // mysqli or pdodb
 // currently there is a problem with pdodb
 // This is un used
