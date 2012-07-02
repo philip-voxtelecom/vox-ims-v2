@@ -27,6 +27,8 @@ class Cache_pdodb extends Cache {
 
     function __construct() {
         $this->dbh = MetaDatabaseConnection::get('cache')->handle();
+        if (isset($GLOBALS['config']->cacheExpiryTime))
+            $this->expirytime = $GLOBALS['config']->cacheExpiryTime;
     }
 
     function load() {
