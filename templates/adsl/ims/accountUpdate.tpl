@@ -9,6 +9,13 @@
         <fieldset class="sectionwrap">
             <legend>Product Detail</legend>
             {$accountProduct}
+            <div class="form-row">
+                <div class="field-label"><label for="_save_password">Password *</label>:</div>
+                <div class="field-widget">
+                    <input name="_save_password" id="_save_password" {if empty($viewobject) or $viewobject->action != 'update'}class="required"{/if} style="width:340px;" title="Enter password for account" onchange="xajax.$('password_detail').innerHTML=this.value;"/>
+                    <input type="button" id="passwordgen" name="passwordgen" value="Generate" onClick="GeneratePassword('_save_password',8);xajax.$('password_detail').innerHTML=xajax.$('_save_password').value;"/>
+                </div>
+            </div>
         </fieldset>
 
         <fieldset class="sectionwrap">

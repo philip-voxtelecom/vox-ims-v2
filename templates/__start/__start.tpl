@@ -1,6 +1,6 @@
 {include file="header.tpl" title="Internet Management System"}
 
-
+<div id="overDiv" style="position:absolute; visibility:hidden; z-index:2000;"></div>
 
 <div id="header" class="logo"></div>
 

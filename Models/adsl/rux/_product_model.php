@@ -85,6 +85,15 @@ class Product_rux extends Product {
                 'immutable' => array(),
                 'validation' => array('regex' => '^[0-9]*$', 'class' => 'number'),
                 'hint' => 'Size of traffic bundle in GB'
+            ),
+            'callingstation' => array(
+                'description' => 'ADSL line number to allow',
+                'defaultvalue' => '',
+                'value' => NULL,
+                'mandatory' => FALSE,
+                'immutable' => array(),
+                'validation' => array('regex' => '^[0-9]*$', 'class' => 'phone'),
+                'hint' => 'ADSL line number to limit connections from'
             )
         );
     }

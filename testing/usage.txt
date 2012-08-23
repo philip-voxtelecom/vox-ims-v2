@@ -1,0 +1,8 @@
+{"usages":
+    [{"accountId":23386057,"usageType":"NORMAL","inputBytes":"5902259240","outputBytes":"21990323276"},
+     {"accountId":23402001,"usageType":"NORMAL","inputBytes":"561542164","outputBytes":"4005010990"},
+     {"accountId":23402002,"usageType":"NORMAL","inputBytes":"561542164","outputBytes":"995010990"},
+     {"accountId":23402003,"usageType":"NORMAL","inputBytes":"561542164","outputBytes":"995010990"},
+     {"accountId":23401054,"usageType":"NORMAL","inputBytes":"1172374199","outputBytes":"2833192035"}
+    ],
+ "responseCode":"COMPLETED"}

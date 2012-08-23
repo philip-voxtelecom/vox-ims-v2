@@ -2,17 +2,24 @@
 
 $xajax->registerFunction("accountView");
 $xajax->registerFunction("accountSubmit");
+$xajax->registerFunction("logout");
 
 function accountView($viewrequest, $viewarray) {
     $view = new AccountView_ims();
-    if (method_exists($view, $viewrequest))
+    if (method_exists($view, $viewrequest)) {
         return call_user_func_array(array($view, $viewrequest), array($viewarray));
+    } else {
+        throw new Exception("Function $viewrequest does not exist in accountView class");
+    }
 }
 
 function accountSubmit($submitrequest, $data) {
     $request = new AccountSubmit_ims();
-    if (method_exists($request, $submitrequest))
+    if (method_exists($request, $submitrequest)) {
         return call_user_func_array(array($request, $submitrequest), array($data));
+    } else {
+        throw new Exception("Function $submitrequest does not exist in accountSubmit class");
+    }
 }
 
 class AccountView_ims extends AccountView {
@@ -22,6 +29,13 @@ class AccountView_ims extends AccountView {
     public function __construct($viewobject = null) {
         $this->xajax = new xajaxResponse();
         parent::__construct($viewobject);
+    }
+
+    public function logout() {
+        session_destroy();
+        $url = $GLOBALS['config']->baseURL;
+        $this->xajax->script("window.location.href='http://$url';");
+        return $this->xajax;
     }
 
     public function display($viewarray = NULL) {
@@ -136,6 +150,11 @@ class AccountView_ims extends AccountView {
             $menuitem = $menu1->addChild('menuitem');
             $menuitem->addChild('face', 'Historical Usage');
             $menuitem->addChild('action', "xajax_accountView('monthlyUsage',{id: $accountId});");
+        }
+        if ($GLOBALS['auth']->checkAuth('adsl_account', AUTH_READ) and $viewobject->data->account->status != "cancelled") {
+            $menuitem = $menu1->addChild('menuitem');
+            $menuitem->addChild('face', 'Active Sessions');
+            $menuitem->addChild('action', "xajax_accountView('activeSessions',{id: $accountId});");
         }
         /*
           if ($GLOBALS['auth']->checkAuth('adsl_account', AUTH_READ)) {
@@ -345,15 +364,49 @@ class AccountView_ims extends AccountView {
 
     public function dailyUsage($viewarray = NULL) {
         //$viewobject = new ViewObject(parent::dailyUsage($viewarray));
-        $viewobject = parent::dailyUsage($viewarray);
+        try {
+            $viewobject = parent::dailyUsage($viewarray);
+        } catch (Exception $e) {
+            $this->xajax->script("alert('No usage found');");
+            return $this->xajax;
+        }
 
         $this->setPage($viewarray);
-
+        $date = preg_split('/-/', $viewobject['usageMonth']);
         $this->smarty->assign("viewobject", $viewobject['days']);
+        $this->smarty->assign("totals", $viewobject['totals']);
         $this->smarty->assign("offset", "$this->offset");
         $this->smarty->assign("limit", $this->limit);
         $this->smarty->assign("search", $this->search);
+        $this->smarty->assign("year", $date[0]);
+        $this->smarty->assign("month", $date[1]);
+        $this->smarty->assign("day", $date[2]);
+        $this->smarty->assign("accountId", $viewarray['id']);
         $content = $this->smarty->fetch('accountDailyStats.tpl');
+        $this->xajax->assign("content", "innerHTML", $content);
+
+        return $this->xajax;
+    }
+
+    public function dailyUsageDetail($viewarray = NULL) {
+        try {
+            $viewobject = parent::dailyUsageDetail($viewarray);
+        } catch (Exception $e) {
+            $this->xajax->script("alert('No usage found');");
+            return $this->xajax;
+        }
+
+
+        $this->setPage($viewarray);
+
+        $this->smarty->assign("viewobject", $viewobject['sessions']);
+        $this->smarty->assign("offset", "$this->offset");
+        $this->smarty->assign("limit", $this->limit);
+        $this->smarty->assign("search", $this->search);
+        $this->smarty->assign("year", $viewarray['year']);
+        $this->smarty->assign("month", $viewarray['month']);
+        $this->smarty->assign("day", $viewarray['day']);
+        $content = $this->smarty->fetch('accountDailyDetailStats.tpl');
         $this->xajax->assign("content", "innerHTML", $content);
 
         return $this->xajax;
@@ -361,7 +414,12 @@ class AccountView_ims extends AccountView {
 
     public function MonthlyUsage($viewarray = NULL) {
         //$viewobject = new ViewObject(parent::dailyUsage($viewarray));
-        $viewobject = parent::monthlyUsage($viewarray);
+        try {
+            $viewobject = parent::monthlyUsage($viewarray);
+        } catch (Exception $e) {
+            $this->xajax->script("alert('No usage found');");
+            return $this->xajax;
+        }
 
         $this->setPage($viewarray);
 
@@ -369,7 +427,29 @@ class AccountView_ims extends AccountView {
         $this->smarty->assign("offset", "$this->offset");
         $this->smarty->assign("limit", $this->limit);
         $this->smarty->assign("search", $this->search);
+        $this->smarty->assign("accountId", $viewarray['id']);
         $content = $this->smarty->fetch('accountMonthlyStats.tpl');
+        $this->xajax->assign("content", "innerHTML", $content);
+
+        return $this->xajax;
+    }
+
+    public function activeSessions($viewarray = NULL) {
+        //$viewobject = new ViewObject(parent::dailyUsage($viewarray));
+        try {
+            $viewobject = parent::activeSessions($viewarray);
+        } catch (Exception $e) {
+            $this->xajax->script("alert('No active sessions found');");
+            return $this->xajax;
+        }
+
+        $this->setPage($viewarray);
+        $this->smarty->assign("viewobject", $viewobject);
+        $this->smarty->assign("offset", "$this->offset");
+        $this->smarty->assign("limit", $this->limit);
+        $this->smarty->assign("search", $this->search);
+        $this->smarty->assign("accountId", $viewarray['id']);
+        $content = $this->smarty->fetch('accountActiveSessions.tpl');
         $this->xajax->assign("content", "innerHTML", $content);
 
         return $this->xajax;
@@ -403,7 +483,7 @@ class AccountView_ims extends AccountView {
     public function printlist($viewarray = NULL) {
         $accounts = parent::listall($viewarray);
         $this->smarty->assign("usernames", $accounts);
-        $accountlist = $this->smarty->fetch('accountlistPrint.tpl');
+        $accountlist = $this->smarty->fetch('accountListPrint.tpl');
         $this->xajax->append("content", "innerHTML", $accountlist);
         $this->xajax->script('printpage("account_list");');
 
@@ -413,7 +493,7 @@ class AccountView_ims extends AccountView {
     public function exportlist($viewarray = NULL) {
         $accounts = parent::listall($viewarray);
         $this->smarty->assign("usernames", $accounts);
-        $accountlist = $this->smarty->fetch('accountlistExport.tpl');
+        $accountlist = $this->smarty->fetch('accountListExport.tpl');
         $fileid = "accountlist_" . uniqid() . ".csv";
         file_put_contents($GLOBALS['documentroot'] . "/cache/" . $fileid, $accountlist);
         //$this->xajax->append("content","innerHTML",$accountlist);
@@ -437,12 +517,25 @@ class AccountView_ims extends AccountView {
         return $this->xajax;
     }
 
+    public function errorCallback($viewarray = NULL) {
+
+        if (isset($viewarray['error']))
+            $error = $viewarray['error'];
+
+        $this->xajax->script("alert('The following error was encountered: $error');");
+        return $this->xajax;
+    }
+
 }
 
 //TOD this should be in the controller as a loaded provider controller
 class AccountSubmit_ims {
 
     public function create($formdata) {
+        $viewobject = new ViewObject('<root></root>');
+        $data = $viewobject->addChild('data');
+
+
         try {
             $account = new AccountController();
             $params = array();
@@ -457,6 +550,8 @@ class AccountSubmit_ims {
                 $params['notifycell'] = $formdata['_save_cellno'];
             if (isset($formdata['_save_note']))
                 $params['note'] = $formdata['_save_note'];
+            if (isset($formdata['_save_mailreport']))
+                $params['mailreport'] = $formdata['_save_mailreport'];
             if (isset($formdata['product']))
                 $params['product'] = $formdata['product'];
             if (isset($formdata['_save_username']))
@@ -465,17 +560,19 @@ class AccountSubmit_ims {
                 $params['systemReference'] = $formdata['_save_systemReference'];
             if (isset($formdata['_save_bundlesize']))
                 $params['bundlesize'] = $formdata['_save_bundlesize'];
+            if (isset($formdata['_save_callingstation']))
+                $params['callingstation'] = $formdata['_save_callingstation'];
 
             $id = $account->create($params);
         } catch (Exception $e) {
-            throw new Exception("Error creating account: " . $e->getMessage());
+            $view = new AccountView_ims($viewobject->asXML());
+            error_log("Error creating account: " . $e->getMessage());
+            return $view->errorCallback(array('error' => 'Could not create account: ' . $e->getMessage()));
+            //throw new Exception("Error creating account: " . $e->getMessage());
         }
-        $viewobject = new ViewObject('<root></root>');
-        $data = $viewobject->addChild('data');
-        $data->addChild('id', $id);
-
 
         $view = new AccountView_ims($viewobject->asXML());
+        $data->addChild('id', $id);
         return $view->detailCallback(array('return' => 'false'));
     }
 
@@ -484,6 +581,8 @@ class AccountSubmit_ims {
         $offset = 0;
         $limit = $GLOBALS['config']->displayRowLimit;
         $search = NULL;
+        $viewobject = new ViewObject('<root></root>');
+        $data = $viewobject->addChild('data');
 
         try {
             $account = new AccountController();
@@ -491,32 +590,41 @@ class AccountSubmit_ims {
 
             $accountId = $formdata['id'];
             $account->read($accountId);
+            $properties = $account->properties();
 
-            //foreach ($formdata as $update) {
-            //    error_log($update);
-            if (isset($formdata['_save_status']))
+            /*
+            foreach ($formdata as $key => $update) {
+                error_log("$key = $update");
+            }
+             * 
+             */
+
+            if (isset($formdata['_save_status']) and $formdata['_save_status'] != $properties['status'])
                 $params['status'] = $formdata['_save_status'];
             if (isset($formdata['_save_topup']))
                 $params['topup'] = $formdata['_save_topup'];
-            if (isset($formdata['_save_email']))
+            if (isset($formdata['_save_email']) and $formdata['_save_email'] != $properties['notifyemail'])
                 $params['notifyemail'] = $formdata['_save_email'];
-            if (isset($formdata['_save_cellno']))
+            if (isset($formdata['_save_cellno']) and $formdata['_save_cellno'] != $properties['notifycell'])
                 $params['notifycell'] = $formdata['_save_cellno'];
             if (isset($formdata['_save_password']) and !empty($formdata['_save_password']))
                 $params['password'] = $formdata['_save_password'];
-            if (isset($formdata['_save_note']))
+            if (isset($formdata['_save_note']) and $formdata['_save_note'] != $properties['note'])
                 $params['note'] = $formdata['_save_note'];
-            if (isset($formdata['_save_name']))
+            if (isset($formdata['_save_name']) and $formdata['_save_name'] != $properties['description'])
                 $params['description'] = $formdata['_save_name'];
-            if (isset($formdata['_save_bundlesize']))
+            if (isset($formdata['_save_bundlesize']) and $formdata['_save_bundlesize'] != $properties['bundlesize'])
                 $params['bundlesize'] = $formdata['_save_bundlesize'];
-            //}
+            if (isset($formdata['_save_callingstation']) and $formdata['_save_callingstation'] != $properties['callingstation'])
+                $params['callingstation'] = $formdata['_save_callingstation'];
             $id = $account->update($params);
         } catch (Exception $e) {
-            throw new Exception("Error updating account: " . $e->getMessage());
+            $view = new AccountView_ims($viewobject->asXML());
+            error_log("Error updating account: " . $e->getMessage());
+            return $view->errorCallback(array('error' => 'Could not update account: ' . $e->getMessage()));
+            //throw new Exception("Error updating account: " . $e->getMessage());
         }
-        $viewobject = new ViewObject('<root></root>');
-        $data = $viewobject->addChild('data');
+
         $data->addChild('id', $accountId);
 
         $offset = $formdata['offset'];
@@ -541,7 +649,10 @@ class AccountSubmit_ims {
             $account->read($accountId);
             $account->delete();
         } catch (Exception $e) {
-            throw new Exception("Error deleting account: " . $e->getMessage());
+            $view = new AccountView_ims();
+            error_log("Error deleting account: " . $e->getMessage());
+            return $view->errorCallback(array('error' => 'Could not delete account: ' . $e->getMessage()));
+            //throw new Exception("Error deleting account: " . $e->getMessage());
         }
 
         $offset = $formdata['offset'];
@@ -550,6 +661,54 @@ class AccountSubmit_ims {
 
         $view = new AccountView_ims();
         return $view->listCallback(array('offset' => $offset, 'search' => $search, 'limit' => $limit));
+    }
+
+    public function disconnectSession($formdata) {
+
+        $offset = 0;
+        $limit = $GLOBALS['config']->displayRowLimit;
+        $search = NULL;
+        $viewobject = new ViewObject('<root></root>');
+        $data = $viewobject->addChild('data');
+        $accountId = $formdata['id'];
+        
+        try {
+            $account = new AccountController();
+
+            $account->read($accountId);
+            $properties = $account->properties();
+            $username = $properties['username'];
+            
+            $server = "196.22.195.3:8080";
+            $wsdl = "voxdsl/soap/description";
+
+            $conmanager = new SoapClient("http://$server/$wsdl",
+                            array("trace" => 1,
+                                "exceptions" => 1,
+                                "cache_wsdl" => WSDL_CACHE_NONE,
+                                'soap_version' => SOAP_1_1
+                            )
+            );
+
+            //TODO fix for production
+            //if ($result = $conmanager->sendPOD("CON", $username)) {
+            if ($result = $conmanager->sendPOD("CON", "12123@fast.interprise.co.za")) {
+                error_log("Failed sending disconnect for $username");
+            } else {
+                error_log("Successfully sent disconnect for $username");
+            }
+        } catch (Exception $e) {
+            
+        }
+
+        $data->addChild('id', $accountId);
+                
+        $offset = $formdata['offset'];
+        $search = $formdata['search'];
+        $limit = $formdata['limit'];
+
+        $view = new AccountView_ims($viewobject->asXML());
+        return $view->detailCallback(array('offset' => $offset, 'search' => $search, 'limit' => $limit));
     }
 
 }

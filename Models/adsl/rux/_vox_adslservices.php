@@ -18,6 +18,7 @@ class VoxADSL {
             throw new Exception("Null parameter send through");
         
         $json_param = json_encode($param);
+        //error_log(print_r($json_param,true));
         
         if ($json_param == FALSE)
             throw new Exception("Could not convert parameter to json object");
@@ -39,7 +40,10 @@ class VoxADSL {
                 ),
                     ));
             ini_set('default_socket_timeout', 300);
+            error_log($this->url."\n".$json_param);
             $result_json = file_get_contents($this->url, null, $http_context);
+            if (empty($result_json))
+                throw new Exception('No response from service');
             $result = json_decode($result_json,true);
             return $result;
         } catch (Exception $e) {
@@ -78,8 +82,10 @@ class VoxADSL {
         $methodList['account']['method']['findinactiveaccounts'] = '/V2/ADSL/ACCOUNT/FINDINACTIVEACCOUNTS';
         $methodList['account']['method']['activate'] = '/V2/ADSL/ACCOUNT/PROVISION/ACTIVATE';
         $methodList['account']['method']['addattribute'] = '/V2/ADSL/ACCOUNT/PROVISION/ADDATTRIBUTE';
-        $methodList['account']['method']['create'] = '/V2/ADSL/ACCOUNT/PROVISION/CREATE';
-        $methodList['account']['method']['delete'] = '/V2/ADSL/ACCOUNT/PROVISION/DELETE';
+        //$methodList['account']['method']['create'] = '/V2/ADSL/ACCOUNT/PROVISION/CREATE';
+        //$methodList['account']['method']['delete'] = '/V2/ADSL/ACCOUNT/PROVISION/DELETE';
+        $methodList['account']['method']['create'] = '/V2/ADSL/ACCOUNT/PROVISION/CREATERADIUSACCOUNT';
+        $methodList['account']['method']['delete'] = '/V2/ADSL/ACCOUNT/PROVISION/DELETERADIUSACCOUNT';
         $methodList['account']['method']['hardcap'] = '/V2/ADSL/ACCOUNT/PROVISION/HARDCAP';
         $methodList['account']['method']['softcap'] = '/V2/ADSL/ACCOUNT/PROVISION/SOFTCAP';
         $methodList['account']['method']['suspend'] = '/V2/ADSL/ACCOUNT/PROVISION/SUSPEND';
@@ -89,6 +95,7 @@ class VoxADSL {
         $methodList['account']['method']['updatenote'] = '/V2/ADSL/ACCOUNT/PROVISION/UPDATENOTE';
         $methodList['account']['method']['updatepassword'] = '/V2/ADSL/ACCOUNT/PROVISION/UPDATEPASSWORD';
         $methodList['account']['method']['updateaccounttype'] = '/V2/ADSL/ACCOUNT/PROVISION/UPDATEACCOUNTTYPE';
+        $methodList['account']['method']['updateaccount'] = '/V2/ADSL/ACCOUNT/PROVISION/UPDATERADIUSACCOUNT';
 
 
         /*
@@ -120,6 +127,9 @@ class VoxADSL {
         $methodList['usage']['method']['totalusagebydaterange'] = '/V2/ADSL/USAGE/TOTALUSAGEBYDATERANGE';
         $methodList['usage']['method']['forreference'] = '/V2/ADSL/USAGE/FORREFERENCE';
         $methodList['usage']['method']['bynumberofmonthsforaccount'] = '/V2/ADSL/USAGE/BYNUMBEROFMONTHSFORACCOUNT';
+        $methodList['usage']['method']['bysystemid'] = '/V2/ADSL/USAGE/BYSYSTEMID';
+        $methodList['usage']['method']['accountsessionsbymonth'] = '/V2/ADSL/USAGE/ACCOUNTSESSIONSBYMONTH';
+        $methodList['usage']['method']['accountsessionsbydaterange'] = '/V2/ADSL/USAGE/ACCOUNTSESSIONSBYDATERANGE';
 
         /*
          * ADSL usage methods - deprecated

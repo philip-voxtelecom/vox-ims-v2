@@ -6,7 +6,7 @@ abstract class Cache {
     public $type;
     public $provider;
     public $identifier;
-    public $expirytime = 460800;
+    public $expirytime = 1460800;
 
     function getData() {
         if (!isset($this->data))

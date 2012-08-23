@@ -1,8 +1,5 @@
 <?php
 
-if (!$GLOBALS['auth']->checkAuth('adsl', AUTH_READ))
-    throw new Exception('Access Denied');
-
 require_once('_meta_db.php');
 
 include '_auth.php';

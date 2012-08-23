@@ -287,4 +287,10 @@ Validation.addAllThese([
         ['validate-username', 'Username is unavailable', function(v) {
 				return Validation.get('IsEmpty').test(v) || /^available$/.test(v);
 			}],
+        ['validate-password', 'Your password must be more than 6 alpha-numeric characters and not be trivial or the same as your username', {
+                                minLength : 7,
+                                notOneOf : ['password','PASSWORD','1234567','0123456','secret','p@ssw0rd','p2ssw0rd'],
+                                notEqualToField : '_save_user',
+                                include: ['validate-alphanum']
+                        }],
 ]);

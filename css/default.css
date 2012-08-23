@@ -50,6 +50,7 @@
     margin: 3px 0px 0px 0px;
     overflow: auto;
     background-color: white;
+    z-index: auto;
 }
 
 #content {
@@ -72,6 +73,7 @@
     margin: 3px 0px 0px 0px;
     background-color: white;
     overflow: auto;
+    z-index: auto;
 }
 
 #status_bar {
@@ -228,4 +230,22 @@ html, body {
 {
     margin-left:auto;
     margin-right:auto;
+}
+
+.detailButtonLeft {
+    float: left;
+    margin-right: 5em;
+    margin-top: 10px;
+    margin-bottom: 5px; 
+    margin-left: 1em;
+    border-radius:5px;
+    -webkit-border-radius:5px;
+    -moz-border-radius:5px;
+    padding:2px 5px;
+    background:#8A0000;
+    color:white;
+    cursor:hand;
+    cursor:pointer;
+    border-style: none;
+    font-weight: bold;
 }

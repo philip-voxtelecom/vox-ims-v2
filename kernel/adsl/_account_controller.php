@@ -40,6 +40,11 @@ class AccountController {
         )
     );
 
+    public function __construct() {
+        if (!$GLOBALS['auth']->checkAuth('adsl', AUTH_READ))
+            throw new Exception('Access Denied');;
+    }
+
     public function create($parameters) {
         /*
          * $parameters must be an associative array of parameters
@@ -58,6 +63,8 @@ class AccountController {
          * note
          * 
          */
+        if (!$GLOBALS['auth']->checkAuth('adsl_account', AUTH_CREATE))
+            throw new Exception('Access Denied');
         $time_start = microtime(true);
         $auditdata = array();
         array_push($auditdata, $parameters);
@@ -86,7 +93,7 @@ class AccountController {
         try {
             $this->account->create();
         } catch (Exception $e) {
-            throw new Exception("Error creating account: " . $e->getMessage());
+            throw new Exception($e->getMessage());
         }
         if (isset($parameters['note']))
             $this->account->update(array('note' => $parameters['note']));
@@ -94,6 +101,10 @@ class AccountController {
             $this->account->update(array('notifycell' => $this->account->notifycell));
         if (isset($this->account->notifyemail))
             $this->account->update(array('notifyemail' => $this->account->notifyemail));
+        if (isset($this->account->mailreport))
+            $this->account->update(array('mailreport' => $this->account->mailreport));
+        if (isset($this->account->callingstation))
+            $this->account->update(array('callingstation' => $this->account->callingstation));
 
         $time = microtime(true) - $time_start;
         audit('account', 'create', $auditdata, $time);
@@ -101,11 +112,11 @@ class AccountController {
     }
 
     public function read($id) {
+        if (!$GLOBALS['auth']->checkAuth('adsl_account', AUTH_READ))
+            throw new Exception('Access Denied');
         $time_start = microtime(true);
         $auditdata = array();
         array_push($auditdata, $id);
-
-
 
         if (empty($id))
             throw new InvalidArgumentException("Invalid argument");
@@ -119,6 +130,8 @@ class AccountController {
     }
 
     public function update($parameters) {
+        if (!$GLOBALS['auth']->checkAuth('adsl_account', AUTH_UPDATE))
+            throw new Exception('Access Denied');
         $time_start = microtime(true);
         $auditdata = array();
         array_push($auditdata, $parameters);
@@ -126,6 +139,14 @@ class AccountController {
         if (empty($this->account))
             throw new Exception("No account loaded for update");
         array_push($auditdata, $this->account->id());
+
+/*
+        foreach ($parameters as $key => $update) {
+            error_log("$key = $update");
+        }
+ * 
+ */
+
 
         $this->account->update($parameters);
         /*
@@ -147,11 +168,13 @@ class AccountController {
     }
 
     public function delete($id = NULL) {
+        if (!$GLOBALS['auth']->checkAuth('adsl_account', AUTH_DELETE))
+            throw new Exception('Access Denied');
         $time_start = microtime(true);
         $auditdata = array();
 
         if (empty($id) and empty($this->account))
-            throw new InvalidArgumentException("Invalid argument");
+            throw new InvalidArgumentException("Invalid arrgument");
 
         if (empty($this->account)) {
             try {
@@ -167,7 +190,7 @@ class AccountController {
             $this->account->delete();
             unset($this->account);
         } catch (Exception $e) {
-            throw new Exception("Problem encountered deleting account");
+            throw new Exception("Problem encountered deleting account: " . $e->getMessage());
         }
 
         $time = microtime(true) - $time_start;
@@ -176,6 +199,8 @@ class AccountController {
     }
 
     public function listall($offset = 0, $limit = 0, $search = NULL) {
+        if (!$GLOBALS['auth']->checkAuth('adsl_account', AUTH_READ))
+            throw new Exception('Access Denied');
         /*
          * listall returns an array of accounts
          * 
@@ -194,6 +219,8 @@ class AccountController {
     }
 
     public function findByUsername($username) {
+        if (!$GLOBALS['auth']->checkAuth('adsl_account', AUTH_READ))
+            throw new Exception('Access Denied');
         $time_start = microtime(true);
         $auditdata = array();
         array_push($auditdata, $username);
@@ -210,6 +237,8 @@ class AccountController {
     }
 
     public function isUsernameAvailable($username) {
+        if (!$GLOBALS['auth']->checkAuth('adsl_account', AUTH_READ))
+            throw new Exception('Access Denied');
         $time_start = microtime(true);
         $auditdata = array();
         array_push($auditdata, $username);
@@ -218,9 +247,9 @@ class AccountController {
             throw new InvalidArgumentException("Invalid argument");
         if (empty($this->account))
             $this->account = AccountFactory::Create();
-        
+
         $result = $this->account->isUsernameAvailable($username);
-        
+
         $time = microtime(true) - $time_start;
         audit('account', 'isUsernameAvailable', $auditdata, $time);
         return $result;
@@ -243,10 +272,14 @@ class AccountController {
     }
 
     public function properties() {
+        if (!$GLOBALS['auth']->checkAuth('adsl_account', AUTH_READ))
+            throw new Exception('Access Denied');
         return $this->account->properties();
     }
 
     public function asXML() {
+        if (!$GLOBALS['auth']->checkAuth('adsl_account', AUTH_READ))
+            throw new Exception('Access Denied');
         return $this->account->asXML();
     }
 
@@ -257,6 +290,8 @@ class AccountController {
     }
 
     public function authenticate($password) {
+        if (!$GLOBALS['auth']->checkAuth('adsl_account', AUTH_READ))
+            throw new Exception('Access Denied');
         if (empty($this->account))
             throw new Exception("Cannot authenticate unloaded account");
         if (encrypt($password, $this->account->username) == $this->account->_accesskey_)

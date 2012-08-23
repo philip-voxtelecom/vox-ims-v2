@@ -25,7 +25,7 @@
             <div class="form-row">
                 <div class="field-label"><label for="_save_realm">Realm</label>:</div>
                 <div class="field-widget">
-                    <select name="_save_realm" id="_save_realm" class="validate-selection" onchange="if (xajax.$('_save_realm').value != 'null') {ldelim}xajax.$('_save_username').value=xajax.$('_save_user').value+'@'+this.value;{rdelim}">
+                    <select name="_save_realm" id="_save_realm" class="validate-selection" onchange="if (xajax.$('_save_realm').value != 'null') {ldelim}xajax.$('_save_username').value=xajax.$('_save_user').value+'@'+this.value;xajax.$('username_detail').innerHTML=xajax.$('_save_username').value;{rdelim}">
                         <option value="null">Please select</option>
                         {section name=realm loop=$realms}
                             {if $realms[realm].status|lower == 'active'}
@@ -38,8 +38,7 @@
             </div>
             <div class="form-row">
                 <div class="field-label"><label for="_save_user">Username</label>:</div>
-                <div class="field-widget"><input value="" name="_save_user" id="_save_user" class="required validate-alphanum" style="width:340px;" title="Username to create" 
-                                                 onchange="xajax_accountView('isUsernameAvailable',xajax.$('_save_username').value);"
+                <div class="field-widget"><input value="" name="_save_user" id="_save_user" class="required  validate-alphanum" style="width:340px;" title="Username to create" 
                                                  onkeyup="Validation.reset('isUsernameAvailable');xajax.$('_save_username').value=this.value+'@'+xajax.$('_save_realm').value;xajax.$('username_detail').innerHTML=xajax.$('_save_username').value;"/></div>
             </div>
             <div class="form-row">
@@ -48,16 +47,31 @@
                     <input value="" name="_save_username" id="_save_username" style="width:340px;" title="Resultant username" readonly="readonly" />
                     <input value="" type="hidden" id="isUsernameAvailable" name="isUsernameAvailable" class="validate-username"/>
                 </div>                        
+            </div>
+            {foreach from=$productoptions key=option item=property}
+                {if !(!empty($property.immutable.update) and isset($viewobject) and $viewobject->action == 'update')}
+                    <div class="form-row">
+                        <div class="field-label"><label for="_option_{$option}">{$property.description}</label>:</div>
+                        <div class="field-widget"><input value="{$property.defaultvalue}" name="_save_{$option}" id="_save_{$option}" class="{if $property.mandatory == true}required{/if} {if isset($property.validation.class)}validate-{$property.validation.class}{/if}" style="width:340px;" title="{$property.hint}" onchange="xajax.$('{$option}_detail').innerHTML=this.value;"/></div>
+                    </div>
+                {/if}
+            {/foreach}
+            <div class="form-row">
+                <div class="field-label"><label for="_save_password">Password</label>:</div>
+                <div class="field-widget">
+                    <input name="_save_password" id="_save_password" {if empty($viewobject) or $viewobject->action != 'update'}class="required validate-password"{/if} style="width:340px;" title="Enter password for account" onchange="xajax.$('password_detail').innerHTML=this.value;"/>
+                    <input type="button" id="passwordgen" name="passwordgen" value="Generate" onClick="GeneratePassword('_save_password',8);xajax.$('password_detail').innerHTML=xajax.$('_save_password').value;"/>
+                </div>
 
-                {foreach from=$productoptions key=option item=property}
-                    {if !(!empty($property.immutable.update) and isset($viewobject) and $viewobject->action == 'update')}
-                        <div class="form-row">
-                            <div class="field-label"><label for="_option_{$option}">{$property.description}</label>:</div>
-                            <div class="field-widget"><input value="{$property.defaultvalue}" name="_save_{$option}" id="_save_{$option}" {if $property.mandatory == true}class="required {if isset($property.validation.class)}validate-{$property.validation.class}{/if}"{/if} style="width:340px;" title="{$property.hint}" onchange="xajax.$('{$option}_detail').innerHTML=this.value;"/></div>
-                        </div>
-                    {/if}
-                {/foreach}
-
+            </div>
+            {foreach from=$accountoptions key=option item=property}
+                {if !(!empty($property.immutable.update) and isset($viewobject) and $viewobject->action == 'update')}
+                    <div class="form-row">
+                        <div class="field-label"><label for="_option_{$option}">{$property.description}</label>:</div>
+                        <div class="field-widget"><input value="{$property.defaultvalue}" name="_save_{$option}" id="_save_{$option}" {if $property.mandatory == true}class="required {if isset($property.validation.class)}validate-{$property.validation.class}{/if}"{/if} style="width:340px;" title="{$property.hint}" onchange="xajax.$('{$option}_detail').innerHTML=this.value;"/></div>
+                    </div>
+                {/if}
+            {/foreach}
         </fieldset>
 
         <fieldset class="sectionwrap">
@@ -93,6 +107,9 @@
                     <tr>
                         <td class="label" onclick="togglePrint(this.parentNode);">Email</td><td class="detail" id="email_detail"></td>
                     </tr>
+                    <tr>
+                        <td class="label" onclick="togglePrint(this.parentNode);">Mail usage reports</td><td class="detail" id="mailreport_detail"></td>
+                    </tr>                    
                     {foreach from=$accountoptions key=option item=property}
                         <tr>
                             <td class="label" onclick="togglePrint(this.parentNode);">{$property.description}</td><td class="detail" id="{$option}_detail"></td>
@@ -110,7 +127,7 @@
                 </table>
                 <div class="center"><button type="button" class="detailButton"
                                             onclick="var valid = new Validation('accountCreateForm');
-                                                if (!valid.validate()) return false;this.style.visibility='hidden';
+                                                if (!valid.validate()) return false;
                                                 xajax_accountSubmit('create',xajax.getFormValues('accountCreateForm'));">
                         Create Account
                     </button>

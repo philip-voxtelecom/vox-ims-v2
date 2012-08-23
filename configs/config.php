@@ -7,6 +7,8 @@ $config = new Config();
 $config->VERSION = '0.9.2';
 $config->debug = TRUE;
 
+// base URI, no HTTP://
+$config->baseURL = 'localhost';
 // ADSL system this system is interacting with
 $config->provider = 'rux';
 
@@ -24,7 +26,7 @@ $config->displayRowLimit = 20;
 //$config->adsl_meta_dbhost = 'localhost';
 //$config->adsl_meta_dbuser = 'adslmeta';
 //$config->adsl_meta_dbname = 'adslmeta';
-//$config->adsl_meta_dbpass = 'y6t5r4e3';
+//$config->adsl_meta_dbpass = 'password';
 
 $config->use_cache = TRUE;
 $config->cacheExpiryTime = 14400;

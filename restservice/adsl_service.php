@@ -42,10 +42,12 @@ if ($service->url_elements[2] == 'account') {
          * GET
          */
         $response = array();
-        $account = new AccountController();
         try {
+            $account = new AccountController();
             if (preg_match('/@/', $service->url_elements[3])) {
                 $id = $account->findByUsername($service->url_elements[3]);
+                if (empty($id))
+                    throw new Exception("Account not found");
             } else {
                 $id = $service->url_elements[3];
             }
@@ -107,8 +109,9 @@ if ($service->url_elements[2] == 'account') {
         /*
          * DELETE
          */
-        $account = new AccountController();
+        
         try {
+            $account = new AccountController();
             if (preg_match('/@/', $service->url_elements[3])) {
                 $id = $account->findByUsername($service->url_elements[3]);
             } else {
@@ -206,6 +209,11 @@ if ($service->url_elements[2] == 'usage') {
                 $response['reply'] = $usage->dailyUsageForMonth($id, date('m'));
             if ($service->parameters['type'] == 'currenttotal')
                 $response['reply'] = $usage->totalAccountUsage($id);
+            if ($service->parameters['type'] == 'owner') {
+                $year = $service->parameters['year'];
+                $month =  $service->parameters['month'];
+                $response['reply'] = $usage->systemUsage($id,$year,$month);
+            }
             $response['responseCode'] = 'COMPLETED';
         } catch (Exception $e) {
             $response['message'] = $e->getMessage();

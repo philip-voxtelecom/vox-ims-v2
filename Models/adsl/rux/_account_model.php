@@ -33,8 +33,9 @@ class Account_rux extends Account {
             'allowedUsage' => $this->bundlesize,
             'accountProfileId' => $this->productObj->getId(),
             'isActive' => true,
-            'radiusClass' => 'N|U|10240|0|0|0|31',
-            'groupEntity' => $this->ownerObj->login
+            'radiusClass' => 'N|U|10240|0|0|0|31|0',
+            'radiusProfile' => 'normal',
+            'radiusCallingStationId' => (isset($this->callingstation) ? $this->callingstation : '')
         );
 
         $adsl_service = new VoxADSL();
@@ -51,7 +52,7 @@ class Account_rux extends Account {
             'attributeValue' => encrypt($this->password, strtolower($this->username)),
             'systemInfos' => array()
         );
-        $adsl_service->call_method($createObj);
+        $adsl_service->call_method($updateObj);
         if ($result['responseCode'] != 'COMPLETED')
             error_log("Error creating _accesskey__: " . $result['message']);
         // call read to cache and all that
@@ -138,38 +139,48 @@ class Account_rux extends Account {
         $this->description = isset($result['account']['customerReference']) ? htmlspecialchars($result['account']['customerReference']) : '';
         $this->note = isset($result['account']['note']) ? htmlspecialchars($result['account']['note']) : '';
 
-        /*
-         * TODO uncomment
-         */
         if ($this->owner != $GLOBALS['login']->getLoginId())
             throw new Exception('Accessing account owner does not own');
         return $this->id;
     }
 
     public function update($parameters) {
+        if (!isset($this->id))
+            throw new Exception("No account loaded for update");
         $adsl_service = new VoxADSL();
         foreach ($parameters as $parameter => $value) {
             try {
                 switch ($parameter) {
                     case 'password':
-                        $adsl_service->loadMethod('account', 'updatepassword');
                         $updateObj = array(
-                            'accountId' => $this->id,
-                            'password' => "$value"
+                            'accountId' => (int) $this->id,
+                            'password' => $value,
                         );
+
+                        $adsl_service->loadMethod('account', 'updateaccount');
                         $result = $adsl_service->call_method($updateObj);
                         if ($result['responseCode'] == VoxADSL::FAILED)
                             throw new Exception("Error encountered updating password: " . $result['message']);
-                        $adsl_service->loadMethod('account', 'addattribute');
-                        $updateObj = array(
-                            'accountId' => $this->id,
-                            'attributeKey' => '_accesskey_',
-                            'attributeValue' => encrypt($value, strtolower($this->username)),
-                            'systemInfos' => array()
-                        );
-                        $result = $adsl_service->call_method($updateObj);
-                        if ($result['responseCode'] == VoxADSL::FAILED)
-                            throw new Exception("Error encountered updating password: " . $result['message']);
+                        /*
+                          $adsl_service->loadMethod('account', 'updatepassword');
+                          $updateObj = array(
+                          'accountId' => $this->id,
+                          'password' => "$value"
+                          );
+                          $result = $adsl_service->call_method($updateObj);
+                          if ($result['responseCode'] == VoxADSL::FAILED)
+                          throw new Exception("Error encountered updating password: " . $result['message']);
+                         */
+                          $adsl_service->loadMethod('account', 'addattribute');
+                          $updateObj = array(
+                          'accountId' => $this->id,
+                          'attributeKey' => '_accesskey_',
+                          'attributeValue' => encrypt($value, strtolower($this->username)),
+                          'systemInfos' => array()
+                          );
+                          $result = $adsl_service->call_method($updateObj);
+                          if ($result['responseCode'] == VoxADSL::FAILED)
+                          throw new Exception("Error encountered updating password: " . $result['message']);
                         break;
                     case 'note':
                         $adsl_service->loadMethod('account', 'updatenote');
@@ -215,9 +226,14 @@ class Account_rux extends Account {
                             throw new Exception("Error encountered updating customer reference: " . $result['message']);
                         break;
                     case 'status':
+                        $loginId = $GLOBALS['login']->getLoginId();
+
+                        $this->ownerObj = OwnerFactory::Create();
+                        if ($this->ownerObj->getByLogin($loginId) != $loginId)
+                            throw new Exception("Owner not verified");
                         $updateObj = array(
-                            'accountId' => $this->id,
-                            'message' => "$value"
+                            'accountId' => (int) $this->id,
+                            'message' => ''
                         );
                         if (strtolower($value) == 'suspended') {
                             $adsl_service->loadMethod('account', 'suspend');
@@ -226,10 +242,11 @@ class Account_rux extends Account {
                         }
                         $result = $adsl_service->call_method($updateObj);
                         if ($result['responseCode'] == VoxADSL::FAILED)
-                            throw new Exception("Error encountered suspending account: " . $result['message']);
+                            throw new Exception("Error encountered updating status: " . $result['message']);
                         break;
                     case 'notifycell':
                     case 'notifyemail':
+                    case 'mailreport':
                         $adsl_service->loadMethod('account', 'addattribute');
                         $updateObj = array(
                             'accountId' => $this->id,
@@ -240,6 +257,29 @@ class Account_rux extends Account {
                         $result = $adsl_service->call_method($updateObj);
                         if ($result['responseCode'] == VoxADSL::FAILED)
                             throw new Exception("Error encountered updating attributes: " . $result['message']);
+                        break;
+                    case 'callingstation':
+                        $value = strtoupper($value);
+                        $updateObj = array(
+                            'accountId' => (int) $this->id,
+                            'radiusCallingStationId' => "$value",
+                        );
+                        $adsl_service->loadMethod('account', 'updateaccount');
+                        $result = $adsl_service->call_method($updateObj);
+                        if ($result['responseCode'] == VoxADSL::FAILED)
+                            throw new Exception("Error encountered updating callingstation: " . $result['message']);
+
+                        $adsl_service->loadMethod('account', 'addattribute');
+                        $updateObj = array(
+                            'accountId' => $this->id,
+                            'attributeKey' => $parameter,
+                            'attributeValue' => $value,
+                            'systemInfos' => array()
+                        );
+                        $result = $adsl_service->call_method($updateObj);
+                        if ($result['responseCode'] == VoxADSL::FAILED)
+                            throw new Exception("Error encountered updating attribute callingstation: " . $result['message']);
+
                         break;
                 };
                 if ($GLOBALS['config']->use_cache) {
@@ -340,14 +380,23 @@ class Account_rux extends Account {
         $result = $adsl_service->call_method($queryObj);
         if (isset($result['responseCode']) and $result['responseCode'] == VoxADSL::FAILED)
             throw new Exception("Error encountered finding by username: " . $result['message']);
-        if (
-                isset($result['responseCode'])
-                and $result['responseCode'] == VoxADSL::OK
-                and isset($result['accounts'])
-                and $result['accounts']['accountReference']['systemId'] == $GLOBALS['login']->getLoginId()
-        ) {
-            $this->read($result['accounts']);
-            return $result['accounts']['id'];
+
+        if (isset($result['responseCode']) and $result['responseCode'] == VoxADSL::OK) {
+            if (isset($result['accounts']['id'])) {
+                $fix = $result['accounts'];
+                unset($result);
+                $result = array('accounts' => array($fix));
+            }
+            foreach ($result['accounts'] as $account) {
+                if (
+                        $account['accountReference']['systemId'] == $GLOBALS['login']->getLoginId()
+                        and $account['username'] = $username
+                ) {
+                    $this->read($account);
+
+                    return $account['id'];
+                }
+            }
         }
         return FALSE;
     }
@@ -391,6 +440,11 @@ class AccountList_rux extends AccountList {
                 $result = $adsl_service->call_method($accountfind_obj);
                 if ($result['responseCode'] == VoxADSL::FAILED)
                     throw new Exception("Error encountered fetching account list: " . $result['message']);
+                if (isset($result['accounts']['id'])) {
+                    $fix = $result['accounts'];
+                    unset($result);
+                    $result = array('accounts' => array($fix));
+                }
                 foreach ($result['accounts'] as $item) {
                     if (empty($item['deleted'])) {
                         $account = AccountFactory::Create();

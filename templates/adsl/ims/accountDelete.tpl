@@ -30,7 +30,7 @@
         <button type="button" class="detailButton"
                 onclick="
                     if (! Validation.validate('confirm'))
-                        return; this.style.visibility='hidden';
+                        return; 
                     xajax_accountSubmit('delete',xajax.getFormValues('accountDeleteForm'));">
             Delete
         </button>

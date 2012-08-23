@@ -160,6 +160,18 @@ class AccountView extends View {
         return $totals;
     }
 
+    public function dailyUsageDetail($viewarray = NULL) {
+        $accountId = $viewarray['id'];
+        $forYear = isset($viewarray['year']) ? $viewarray['year'] : NULL;
+        $forMonth = isset($viewarray['month']) ? $viewarray['month'] : date('m');
+        $forDay = isset($viewarray['day']) ? $viewarray['day'] : date('d');
+
+        $usage = new UsageController();
+        $totals = $usage->sessionsForDay($accountId, $forYear, $forMonth, $forDay);
+        //TODO this is Wrong
+        return $totals;
+    }
+    
     public function monthlyUsage($viewarray = NULL) {
         $accountId = $viewarray['id'];
         $numberOfMonths = isset($viewarray['numberofmonths']) ? $viewarray['numberofmonths'] : 12;
@@ -169,6 +181,14 @@ class AccountView extends View {
         return array_reverse($totals);
     }
 
+    public function activeSessions($viewarray = NULL) {
+        $accountId = $viewarray['id'];
+
+        $usage = new UsageController();
+        $totals = $usage->activeSessions($accountId);
+        return $totals;
+    }
+    
     public function read($id) {
         $account = AccountFactory::Create();
         $account->read($id);
@@ -190,46 +210,3 @@ class AccountViewFactory {
 
 }
 
-/*
-
-
-
-class accountActivityView extends View {
-
-    public function display() {
-        $viewobject = new ViewObject($this->viewobject);
-        $this->smarty->assign("viewobject", $viewobject);
-        $content = $this->smarty->fetch('accountActivity.tpl');
-        $this->xajax->assign("content", "innerHTML", $content);
-        //return Error("<pre><xmp>".print_r($viewobject->asXML(),true)."</xmp></pre>");
-        return $this->xajax;
-    }
-
-}
-
-class accountSessionView extends View {
-
-    public function display() {
-        $viewobject = new ViewObject($this->viewobject);
-        $this->smarty->assign("viewobject", $viewobject);
-        $content = $this->smarty->fetch('accountSessions.tpl');
-        $this->xajax->assign("content", "innerHTML", $content);
-        return $this->xajax;
-    }
-
-}
-
-
-class accountError extends View {
-
-    public function display($errormsg) {
-        //$this->smarty->assign('account',$this->viewobject);
-        //$detail = $this->smarty->fetch('accountDetail.tpl');
-        $this->xajax->assign("right_bar_content", "innerHTML", $errormsg);
-        return $this->xajax;
-    }
-
-}
-
- * 
- */
