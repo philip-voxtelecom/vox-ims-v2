@@ -4,7 +4,7 @@ require $GLOBALS['documentroot'] . '/classes/Config.class.php';
 
 $config = new Config();
 
-$config->VERSION = '0.9.2';
+$config->VERSION = '0.9.4';
 $config->debug = TRUE;
 
 // base URI, no HTTP://
