@@ -366,8 +366,11 @@ class AccountView_ims extends AccountView {
         //$viewobject = new ViewObject(parent::dailyUsage($viewarray));
         try {
             $viewobject = parent::dailyUsage($viewarray);
-        } catch (Exception $e) {
+        } catch (EmptyException $e) {
             $this->xajax->script("alert('No usage found');");
+            return $this->xajax;
+        } catch (Exception $e) {
+            $this->xajax->script("alert('An error was encountered getting the usage');");
             return $this->xajax;
         }
 
@@ -438,7 +441,7 @@ class AccountView_ims extends AccountView {
         //$viewobject = new ViewObject(parent::dailyUsage($viewarray));
         try {
             $viewobject = parent::activeSessions($viewarray);
-        } catch (Exception $e) {
+        } catch (EmptyException $e) {
             $this->xajax->script("alert('No active sessions found');");
             return $this->xajax;
         }
@@ -535,6 +538,9 @@ class AccountSubmit_ims {
         $viewobject = new ViewObject('<root></root>');
         $data = $viewobject->addChild('data');
 
+        $offset = 0;
+        $limit = $GLOBALS['config']->displayRowLimit;
+        $search = NULL;
 
         try {
             $account = new AccountController();
@@ -564,6 +570,7 @@ class AccountSubmit_ims {
                 $params['callingstation'] = $formdata['_save_callingstation'];
 
             $id = $account->create($params);
+            $data->addChild('id', $id);
         } catch (Exception $e) {
             $view = new AccountView_ims($viewobject->asXML());
             error_log("Error creating account: " . $e->getMessage());
@@ -572,8 +579,7 @@ class AccountSubmit_ims {
         }
 
         $view = new AccountView_ims($viewobject->asXML());
-        $data->addChild('id', $id);
-        return $view->detailCallback(array('return' => 'false'));
+        return $view->detailCallback(array('offset' => $offset, 'search' => $search, 'limit' => $limit));
     }
 
     public function update($formdata) {
@@ -593,9 +599,9 @@ class AccountSubmit_ims {
             $properties = $account->properties();
 
             /*
-            foreach ($formdata as $key => $update) {
-                error_log("$key = $update");
-            }
+              foreach ($formdata as $key => $update) {
+              error_log("$key = $update");
+              }
              * 
              */
 
@@ -617,6 +623,8 @@ class AccountSubmit_ims {
                 $params['bundlesize'] = $formdata['_save_bundlesize'];
             if (isset($formdata['_save_callingstation']) and $formdata['_save_callingstation'] != $properties['callingstation'])
                 $params['callingstation'] = $formdata['_save_callingstation'];
+            if (isset($formdata['_save_mailreport']) and $formdata['_save_mailreport'] != $properties['mailreport'])
+                $params['mailreport'] = $formdata['_save_mailreport'];
             $id = $account->update($params);
         } catch (Exception $e) {
             $view = new AccountView_ims($viewobject->asXML());
@@ -671,14 +679,14 @@ class AccountSubmit_ims {
         $viewobject = new ViewObject('<root></root>');
         $data = $viewobject->addChild('data');
         $accountId = $formdata['id'];
-        
+
         try {
             $account = new AccountController();
 
             $account->read($accountId);
             $properties = $account->properties();
             $username = $properties['username'];
-            
+
             $server = "196.22.195.3:8080";
             $wsdl = "voxdsl/soap/description";
 
@@ -702,7 +710,7 @@ class AccountSubmit_ims {
         }
 
         $data->addChild('id', $accountId);
-                
+
         $offset = $formdata['offset'];
         $search = $formdata['search'];
         $limit = $formdata['limit'];

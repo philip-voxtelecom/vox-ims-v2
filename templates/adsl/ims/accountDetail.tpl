@@ -16,10 +16,10 @@
         <div class="field-label"><label for="_save_mailreport">Email usage reports</label>:</div>
         <div class="field-widget">
             <select name="_save_mailreport" id="_save_mailreport" class="required" onchange="xajax.$('mailreport_detail').innerHTML=this.options[this.selectedIndex].text;">
-                <option value="never">Never</option>
-                <option value="daily">Daily</option>
-                <option value="weekly">Weekly</option>
-                <option value="monthly">Monthly</option>
+                <option value="never" {if $viewobject->data->account->mailreport=='never'}selected="selected"{/if}>Never</option>
+                <option value="daily" {if $viewobject->data->account->mailreport=='daily'}selected="selected"{/if}>Daily</option>
+                <option value="weekly" {if $viewobject->data->account->mailreport=='weekly'}selected="selected"{/if}>Weekly</option>
+                <option value="monthly {if $viewobject->data->account->mailreport=='monthly'}selected="selected"{/if}">Monthly</option>
             </select>
         </div>
     </div>

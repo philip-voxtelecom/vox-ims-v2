@@ -14,6 +14,7 @@ include '_product_controller.php';
 //include '_userproductdetail_controller.php';
 include '_owner_controller.php';
 include '_usage_controller.php';
+include '_report_controller.php';
 //include '_owneruser_controller.php';
 //include '_ownerproduct_controller.php';
 //include '_ownerproductoption_controller.php';

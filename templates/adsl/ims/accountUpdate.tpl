@@ -37,6 +37,9 @@
                     <tr>
                         <td class="label" onclick="togglePrint(this.parentNode);">Note</td><td class="detail" id="note_detail"></td>
                     </tr>   
+                    <tr>
+                        <td class="label" onclick="togglePrint(this.parentNode);">Mail Report</td><td class="detail" id="mailreport_detail"></td>
+                    </tr> 
                     {foreach from=$accountoptions key=option item=property}
                         {if !(!empty($property.immutable.update) and isset($viewobject) and $viewobject->action == 'update')}
                             <tr>

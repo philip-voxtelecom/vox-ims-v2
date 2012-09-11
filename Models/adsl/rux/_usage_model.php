@@ -59,7 +59,7 @@ class Usage_rux extends Usage {
         if ($result['responseCode'] != 'COMPLETED')
             throw new Exception("Error getting usage for account: " . (isset($result['message']) ? $result['message'] : ""));
         if (empty($result['usages']))
-            throw new Exception("No usage found for account");
+            throw new EmptyException("No usage found for account");
         $totalUsage = array("usageMonth" => $usageMonth, 'days' => array());
         // TODO stupid fix again
         if (isset($result['usages']['outputBytes'])) {
@@ -91,7 +91,7 @@ class Usage_rux extends Usage {
         if ($result['responseCode'] != 'COMPLETED')
             throw new Exception("Error getting usage for account: " . (isset($result['message']) ? $result['message'] : ""));
         if (empty($result['sessions']))
-            throw new Exception("No sessions found for account");
+            throw new EmptyException("No sessions found for account");
         $allSessions = array("sessionMonth" => $usageMonth, 'sessions' => array());
         // TODO stupid fix again
         if (isset($result['sessions']['id'])) {
@@ -122,7 +122,7 @@ class Usage_rux extends Usage {
         if ($result['responseCode'] != 'COMPLETED')
             throw new Exception("Error getting usage for account: " . (isset($result['message']) ? $result['message'] : ""));
         if (empty($result['sessions']))
-            throw new Exception("No sessions found for account");
+            throw new EmptyException("No sessions found for account");
         $allSessions = array("sessionStartDate" => $startdate, "sessionEndDate" => $enddate, 'sessions' => array());
         // TODO stupid fix again
         if (isset($result['sessions']['id'])) {
@@ -150,7 +150,7 @@ class Usage_rux extends Usage {
         if ($result['responseCode'] != 'COMPLETED')
             throw new Exception("Error getting usage for account: " . $result['message']);
         if (empty($result['usages']))
-            throw new Exception("No usage found for account");
+            throw new EmptyException("No usage found for account");
         $totalUsage = array();
         // TODO Stupid check to fix stupid service implementation
         if (isset($result['usages']['month'])) {
@@ -192,7 +192,7 @@ class Usage_rux extends Usage {
         if ($result['responseCode'] != 'COMPLETED')
             throw new Exception("Error getting usage for account: " . $result['message']);
         if (empty($result['usages']))
-            throw new Exception("No usage found for account");
+            throw new EmptyException("No usage found for account");
         $totalUsage = array("downloads" => 0, "uploads" => 0, "totalUsage" => 0);
         foreach ($result['usages'] as $usage) {
             $totalUsage['downloads'] += $usage['outputBytes'];
@@ -219,7 +219,7 @@ class Usage_rux extends Usage {
         if ($result['responseCode'] != 'COMPLETED')
             throw new Exception("Error getting usage for account: " . $result['message']);
         if (empty($result['usages']))
-            throw new Exception("No usage found for account");
+            throw new EmptyException("No usage found for account");
         if (isset($result['usages']['accountId'])) {
             $fix = $result['usages'];
             unset($result);
@@ -228,6 +228,7 @@ class Usage_rux extends Usage {
         $usages = array();
         $usages['systemTotal'] = array("downloads" => 0, "uploads" => 0, "totalUsage" => 0);
         foreach ($result['usages'] as $usage) {
+            $usages['accounts'][$usage['accountId']]['username'] = $usage['username'];
             $usages['accounts'][$usage['accountId']]['downloads'] = (string) $usage['outputBytes'];
             $usages['accounts'][$usage['accountId']]['uploads'] = (string) $usage['inputBytes'];
             $usages['accounts'][$usage['accountId']]['total'] = (string) ($usage['outputBytes'] + $usage['inputBytes']);
@@ -242,12 +243,19 @@ class Usage_rux extends Usage {
     }
 
     public function getActiveSessions($accountId) {
-        $serviceURL = 'http://adsl_manager.voxdev.co.za/sessions';
+        $serviceURL = $GLOBALS['config']->rux_session_url;
         $service = new restclient();
-        $service->username = 'philip';
-        $service->password = 'Bpcxsa4%^';
+        $service->username = $GLOBALS['config']->rux_username;
+        $service->password = $GLOBALS['config']->rux_password;
         $service->url = "$serviceURL";
+        try {
         $sessions = $service->callMethod(array('account_id' => "$accountId"));
+        } catch (Exception $e) {
+            throw new Exception("Error getting active sessions");
+        }
+        if (count($sessions) < 1) {
+            throw new EmptyException("No active sessions found");
+        }
         foreach ($sessions as $key => $session) {
             $sessions[$key]['downloads'] = $session['outputbytes'];
             $sessions[$key]['uploads'] = $session['inputbytes'];

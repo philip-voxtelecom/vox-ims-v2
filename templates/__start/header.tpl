@@ -18,6 +18,7 @@
         <script type="text/javascript" src="/libs/validation/fabtabulous.js"></script>
         <script type="text/javascript" src="/libs/validation/validation.js"></script>
         <script type="text/javascript" src="/libs/formwizard/formwizard.js"></script>
+        <script type="text/javascript" src="/libs/tablekit.js"></script>
         <script type="text/javascript" src="/libs/overlib/overlib.js"></script>
         <script type="text/javascript" src="/libs/common.js"></script>
 

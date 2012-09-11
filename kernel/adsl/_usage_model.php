@@ -3,6 +3,8 @@ $model = 'usage';
 
 load_provider_model($model);
 
+class EmptyException extends Exception { };
+
 abstract class Usage {
     
     abstract public function totalCurrentUsage($accountId);

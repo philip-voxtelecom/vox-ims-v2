@@ -1,7 +1,7 @@
 <div class="titleLabel">Account List</div>
 <table id="list_tbl" class="">
     <tr class="empty"><td colspan="4" style="text-align:left;">
-            <form id="search_f" action="javascript:void(null);" onsubmit="window.prevline = null; searchfilter=xajax.$('account_filter').value; xajax_accountView('listall',{ldelim}offset: 0, limit: {$limit}, search: searchfilter{rdelim});"><input id="account_filter" name="account_filter" style="margin-top:2px; margin-bottom: 2px; border: none; background-color: #EEEEEE; width: 7em;" type="text" value="{if $search == '%'}{else}{$search}{/if}"/><input style="border: 1px solid gray; margin-left: 1em; " type="submit" value="Filter"></form>
+            <form id="search_f" action="javascript:void(null);" onsubmit="window.prevline = null; searchfilter=xajax.$('account_filter').value; xajax_accountView('listall',{ldelim}offset: 0, limit: {$limit}, search: searchfilter{rdelim});"><input id="account_filter" name="account_filter" style="margin-top:2px; margin-bottom: 2px; border: none; background-color: #EEEEEE; width: 7em;" type="text" value="{if $search == '%'}{else}{$search}{/if}"/><input style="border: 1px solid gray; margin-left: 1em; " type="submit" value="Search"></form>
         </td></tr>
     <th>Account</th><th>Description</th><th>Status</th></tr>
     {section name=name loop=$accounts}

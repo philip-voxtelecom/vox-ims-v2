@@ -55,6 +55,11 @@ class initPageView_ims extends View {
            <li><a href="#" onclick="xajax_productView(\'listall\',{});">Products</a></li>
          ';
         }
+        if ($GLOBALS['auth']->checkAuth('adsl_report', AUTH_READ)) {
+            $menulist = $menulist . '
+           <li><a href="#" onclick="xajax_reportView(\'summary\',{});">Reports</a></li>
+         ';
+        }
         $menulist = $menulist . '
         <li><a href="#" onclick="xajax_accountView(\'logout\',{});">Logout</a></li>
          ';

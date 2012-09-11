@@ -31,6 +31,7 @@ class VoxADSL {
             $header .= "Username: $username" . "\r\n";
             $header .= "Password: $password" . "\r\n";
             $header .= "Exchange: $exchange" . "\r\n";
+            $header .= "Connection: close\r\n";
 
             $http_context = stream_context_create(array(
                 'http' => array(
@@ -40,7 +41,7 @@ class VoxADSL {
                 ),
                     ));
             ini_set('default_socket_timeout', 300);
-            error_log($this->url."\n".$json_param);
+            //error_log($this->url."\n".$json_param);
             $result_json = file_get_contents($this->url, null, $http_context);
             if (empty($result_json))
                 throw new Exception('No response from service');
@@ -53,16 +54,15 @@ class VoxADSL {
 
     function loadMethod($service, $methodName) {
 
-        $URL_ADSL_SERVICES = "http://rux-test.voxdev.co.za";
-        //$URL_ADSL_SERVICES = "http://rux.vox.co.za";
-        $URL_ADSL_SERVICES_USER = 'philipc';
-        $URL_ADSL_SERVICES_PASS = 'Bpcxsa4%^';
-        $URL_ADSL_SERVICES_EXCHANGE = 'T2';
+        $URL_ADSL_SERVICES = $GLOBALS['config']->rux_adsl_url;
+        $URL_ADSL_SERVICES_USER = $GLOBALS['config']->rux_username;
+        $URL_ADSL_SERVICES_PASS = $GLOBALS['config']->rux_password;
+        $URL_ADSL_SERVICES_EXCHANGE = $GLOBALS['config']->rux_exchange;
 
-        $URL_ADSL_USAGE = "http://rux.vox.co.za";
-        $URL_ADSL_USAGE_USER = 'philipc';
-        $URL_ADSL_USAGE_PASS = 'Bpcxsa4%^';
-        $URL_ADSL_USAGE_EXCHANGE = 'T2';
+        $URL_ADSL_USAGE = $GLOBALS['config']->rux_usage_url;
+        $URL_ADSL_USAGE_USER = $GLOBALS['config']->rux_username;
+        $URL_ADSL_USAGE_PASS = $GLOBALS['config']->rux_password;
+        $URL_ADSL_USAGE_EXCHANGE = $GLOBALS['config']->rux_exchange;
 
         /*
          * Account services
@@ -130,16 +130,6 @@ class VoxADSL {
         $methodList['usage']['method']['bysystemid'] = '/V2/ADSL/USAGE/BYSYSTEMID';
         $methodList['usage']['method']['accountsessionsbymonth'] = '/V2/ADSL/USAGE/ACCOUNTSESSIONSBYMONTH';
         $methodList['usage']['method']['accountsessionsbydaterange'] = '/V2/ADSL/USAGE/ACCOUNTSESSIONSBYDATERANGE';
-
-        /*
-         * ADSL usage methods - deprecated
-        $methodList['adsl']['URL'] = $URL_ADSL_USAGE;
-        $methodList['adsl']['exchange'] = $URL_ADSL_USAGE_EXCHANGE;
-        $methodList['adsl']['username'] = $URL_ADSL_USAGE_USER;
-        $methodList['adsl']['password'] = $URL_ADSL_USAGE_PASS;
-        $methodList['adsl']['method']['usage'] = '/ADSL/USAGE';
-         * 
-         */
 
         $service = strtolower($service);
         $methodName = strtolower($methodName);

@@ -7,7 +7,7 @@
                 <td id="list_data1" style="text-align: left">{$v.starttime}</td>
                 <td id="list_data1" style="text-align: right">{$v.ipaddress}</td>
                 <td id="list_data1" style="text-align: right">{$v.telephonenumber}</td>
-                {assign var=totalUsage value=$v.totalUsage/1024/1024}
+                {assign var=totalUsage value=`$v.totalUsage/1024/1024`}
                 <td id="list_data1" style="text-align: right">{$totalUsage|string_format:"%.2f"}</td>
             </tr>
         {/foreach}

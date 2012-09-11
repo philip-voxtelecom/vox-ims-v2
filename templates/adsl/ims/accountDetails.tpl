@@ -33,6 +33,12 @@
         </tr>
         <tr>
             <td class="label" onclick="togglePrint(this.parentNode);">Email</td><td class="detail">{$viewobject->data->account->notifyemail}</td>
+        </tr>        
+        <tr>
+            <td class="label" onclick="togglePrint(this.parentNode);">ADSL Line</td><td class="detail">{$viewobject->data->account->callingstation}</td>
+        </tr>
+        <tr>
+            <td class="label" onclick="togglePrint(this.parentNode);">Mail Report</td><td class="detail">{$viewobject->data->account->mailreport|capitalize}</td>
         </tr>
         <tr>
             <td class="label" onclick="togglePrint(this.parentNode);">Status</td><td class="detail">{$viewobject->data->account->status|capitalize}</td>
