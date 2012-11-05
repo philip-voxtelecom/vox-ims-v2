@@ -41,8 +41,11 @@ class VoxADSL {
                 ),
                     ));
             ini_set('default_socket_timeout', 300);
-            //error_log($this->url."\n".$json_param);
+            error_log($this->url."\n".$json_param);
+            $time_start = microtime(true);
             $result_json = file_get_contents($this->url, null, $http_context);
+            $time = microtime(true) - $time_start;
+            error_log($time." seconds\n");
             if (empty($result_json))
                 throw new Exception('No response from service');
             $result = json_decode($result_json,true);

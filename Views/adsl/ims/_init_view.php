@@ -24,7 +24,7 @@ class initPageView_ims extends View {
          */
         if ($GLOBALS['auth']->checkAuth('adsl_accountlist', AUTH_READ)) {
             $menulist = $menulist . '
-           <li><a href="#" onclick="window.prevline = null; xajax_accountView(\'listall\',{offset:0,limit:20});">Accounts</a></li>
+           <li><a href="#" onclick="window.prevline = null; xajax_accountView(\'listall\',{offset:0,limit:20,init: true});">Accounts</a></li>
          ';
         }
 
@@ -57,12 +57,15 @@ class initPageView_ims extends View {
         }
         if ($GLOBALS['auth']->checkAuth('adsl_report', AUTH_READ)) {
             $menulist = $menulist . '
-           <li><a href="#" onclick="xajax_reportView(\'summary\',{});">Reports</a></li>
+           <li><a href="#" onclick="xajax_reportView(\'landing\',{});">Reports</a></li>
          ';
         }
+        /*
         $menulist = $menulist . '
         <li><a href="#" onclick="xajax_accountView(\'logout\',{});">Logout</a></li>
          ';
+         * 
+         */
         $this->smarty->assign('menulist', $menulist);
         $menulist = $this->smarty->fetch('mainMenu.tpl');
         $this->xajax->assign("left_bar", "innerHTML", $menulist);

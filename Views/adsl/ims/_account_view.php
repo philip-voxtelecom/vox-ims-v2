@@ -45,10 +45,14 @@ class AccountView_ims extends AccountView {
     public function listall($viewarray = NULL) {
         $accounts = parent::listall($viewarray);
 
-        // Todo this shouldn't be here, should be passed as part of parent object
-        $List = AccountListFactory::Create();
-        $List->getList(0, 0, $this->search);
-        $count = $List->count();
+        if (isset($viewarray['init'])) {
+            $count = 0;
+        } else {
+            // Todo this shouldn't be here, should be passed as part of parent object
+            $List = AccountListFactory::Create();
+            $List->getList(0, 0, $this->search);
+            $count = $List->count();
+        }
 
 
         $this->smarty->assign("accounts", $accounts);
@@ -73,6 +77,7 @@ class AccountView_ims extends AccountView {
         $accountlistbar = $this->smarty->fetch('accountListMenu.tpl');
         $this->xajax->assign("content", "innerHTML", $accountlist);
         $this->xajax->assign("right_bar", "innerHTML", $accountlistbar);
+        $this->xajax->script("TableKit.reloadTable('list_tbl');");
         return $this->xajax;
     }
 
@@ -376,6 +381,7 @@ class AccountView_ims extends AccountView {
 
         $this->setPage($viewarray);
         $date = preg_split('/-/', $viewobject['usageMonth']);
+        ksort($viewobject['days']);
         $this->smarty->assign("viewobject", $viewobject['days']);
         $this->smarty->assign("totals", $viewobject['totals']);
         $this->smarty->assign("offset", "$this->offset");
@@ -478,7 +484,11 @@ class AccountView_ims extends AccountView {
 
         $this->setPage($viewarray);
 
-        $this->xajax->script("xajax_accountView('listall',{offset: $this->offset, limit: $this->limit, search: '$this->search'});");
+        $init = '';
+        if (isset($viewarray['init']))
+            $init = ", init: true";
+        
+        $this->xajax->script("xajax_accountView('listall',{offset: $this->offset, limit: $this->limit, search: '$this->search' $init});");
         //$this->xajax->script("xajax_accountView('detail',{id: $accountId,offset: $offset, limit: $limit, search: '$search'});");
         return $this->xajax;
     }
@@ -668,7 +678,7 @@ class AccountSubmit_ims {
         $limit = $formdata['limit'];
 
         $view = new AccountView_ims();
-        return $view->listCallback(array('offset' => $offset, 'search' => $search, 'limit' => $limit));
+        return $view->listCallback(array('offset' => $offset, 'search' => $search, 'limit' => $limit, 'init' => true));
     }
 
     public function disconnectSession($formdata) {

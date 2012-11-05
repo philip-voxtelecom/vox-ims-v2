@@ -87,8 +87,8 @@ class AccountController {
             $this->account->$parameter = $value;
         }
 
-        if (!$this->account->isUsernameAvailable($parameters['username']))
-            throw new Exception("username not available");
+        //if (!$this->account->isUsernameAvailable($parameters['username']))
+        //    throw new Exception("username not available");
 
         try {
             $this->account->create();

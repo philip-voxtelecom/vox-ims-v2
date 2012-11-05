@@ -15,7 +15,7 @@ class ReportView extends View {
         ;
     }
 
-    public function summary($viewobject=null) {
+    public function summary($viewarray = null) {
         $accountList = new AccountController();
         $accounts = $accountList->listall();
         $count = count($accounts);
@@ -27,16 +27,26 @@ class ReportView extends View {
 
         $year = date('Y');
         $month = date('m');
-        $owner = $GLOBALS['login']->getLoginId();
 
+        if (isset($viewarray)) {
+            $dates = preg_split('/-/', $viewarray);
+
+            if (checkdate($dates[1], 1, $dates[0])) {
+                $year = $dates[0];
+                $month = $dates[1];
+            }
+        }
+
+        $owner = $GLOBALS['login']->getLoginId();
         $usage = new UsageController();
         try {
             $allusage = $usage->systemUsage($owner, $year, $month);
             foreach ($allusage['accounts'] as $key => $accountusage) {
                 if (isset($accountmap[$key])) {
                     $allusage['accounts'][$key]['username'] = $accountmap[$key];
+                    $allusage['accounts'][$key]['status'] = 'ACTIVE';
                 } else {
-                    $allusage['accounts'][$key]['username'] = $accountusage['username']." (CXD)";
+                    $allusage['accounts'][$key]['username'] = $accountusage['username'] . " (CXD)";
                     $allusage['accounts'][$key]['status'] = 'CANCELLED';
                 }
             }
@@ -70,10 +80,11 @@ class ReportView extends View {
          */
         ksort($allusage['accounts']);
         $allusage['count'] = $count;
+        $allusage['year'] = $year;
+        $allusage['month'] = $month;
         //todo should return XML data
         return $allusage;
     }
-
 
 }
 

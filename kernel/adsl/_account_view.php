@@ -38,9 +38,13 @@ class AccountView extends View {
 
         $this->setPage($viewarray);
 
-        $accountList = new AccountController();
-        $accounts = $accountList->listall($this->offset, $this->limit, $this->search);
-
+        if (isset($viewarray['init'])) {
+            $accounts = array();
+        } else {
+            $accountList = new AccountController();
+            $accounts = $accountList->listall($this->offset, $this->limit, $this->search);
+        }
+        
         $viewobject = new SimpleXMLElement('<root/>');
         $data = $viewobject->addChild('data');
         foreach ($accounts as $account) {
@@ -171,7 +175,7 @@ class AccountView extends View {
         //TODO this is Wrong
         return $totals;
     }
-    
+
     public function monthlyUsage($viewarray = NULL) {
         $accountId = $viewarray['id'];
         $numberOfMonths = isset($viewarray['numberofmonths']) ? $viewarray['numberofmonths'] : 12;
@@ -188,7 +192,7 @@ class AccountView extends View {
         $totals = $usage->activeSessions($accountId);
         return $totals;
     }
-    
+
     public function read($id) {
         $account = AccountFactory::Create();
         $account->read($id);

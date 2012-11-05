@@ -28,15 +28,19 @@
                     <tr >
                         <td class="label" onclick="togglePrint(this.parentNode);">Password</td><td class="detail" id="password_detail" id="password_detail"></td>
                     </tr>
+                    <!--
                     <tr>
                         <td class="label" onclick="togglePrint(this.parentNode);">Cell number</td><td class="detail" id="cell_detail"></td>
                     </tr>
+                    -->
                     <tr>
                         <td class="label" onclick="togglePrint(this.parentNode);">Email</td><td class="detail" id="email_detail"></td>
                     </tr>
+                    <!--
                     <tr>
                         <td class="label" onclick="togglePrint(this.parentNode);">Note</td><td class="detail" id="note_detail"></td>
-                    </tr>   
+                    </tr>
+                    -->
                     <tr>
                         <td class="label" onclick="togglePrint(this.parentNode);">Mail Report</td><td class="detail" id="mailreport_detail"></td>
                     </tr> 

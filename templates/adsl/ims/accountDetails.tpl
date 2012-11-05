@@ -28,9 +28,11 @@
                 <span id='stars' onclick="xajax.$('stars').style.display='none'; xajax.$('pass').style.display='block';">******</span></td>
         </tr>
         -->
+        <!--
         <tr>
             <td class="label" onclick="togglePrint(this.parentNode);">Cell number</td><td class="detail">{$viewobject->data->account->notifycell}</td>
         </tr>
+        -->
         <tr>
             <td class="label" onclick="togglePrint(this.parentNode);">Email</td><td class="detail">{$viewobject->data->account->notifyemail}</td>
         </tr>        
@@ -45,10 +47,12 @@
         </tr>
         <tr>
             <td class="label" onclick="togglePrint(this.parentNode);">System Reference</td><td class="detail">{$viewobject->data->account->systemReference}</td>
-        </tr>      
+        </tr>
+        <!--
         <tr>
             <td class="label" onclick="togglePrint(this.parentNode);">Comments</td><td class="detail">{$viewobject->data->account->note}</td>
         </tr>
+        -->
     </table>
 </div>
 

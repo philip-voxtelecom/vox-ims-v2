@@ -40,6 +40,10 @@ class _bootView extends View {
            ');
         }
 
+
+        $theme = explode('.',$_SERVER['HTTP_HOST']);
+        $this->smarty->assign('theme', $theme[0]);
+        
         $this->smarty->force_compile = 1;
         return $this->smarty->fetch('__start.tpl');
     }

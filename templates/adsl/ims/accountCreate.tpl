@@ -101,9 +101,11 @@
                             <span style="display: none;" id='pass'></span>
                             <span id='stars' onclick="xajax.$('stars').style.display='none'; xajax.$('pass').style.display='block';">******</span></td>
                     </tr>
+                    <!--
                     <tr>
                         <td class="label" onclick="togglePrint(this.parentNode);">Cell number</td><td class="detail" id="cell_detail"></td>
                     </tr>
+                    -->
                     <tr>
                         <td class="label" onclick="togglePrint(this.parentNode);">Email</td><td class="detail" id="email_detail"></td>
                     </tr>
@@ -116,9 +118,11 @@
                         </tr>                        
 
                     {/foreach}                    
+                    <!--
                     <tr>
                         <td class="label" onclick="togglePrint(this.parentNode);">Note</td><td class="detail" id="note_detail"></td>
-                    </tr>                    
+                    </tr>
+                    -->
                     <!--
                     <tr>
                         <td class="label" onclick="togglePrint(this.parentNode);">Reference</td><td class="detail" id="reference_detail"></td>

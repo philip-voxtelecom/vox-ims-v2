@@ -33,7 +33,7 @@ class Account_rux extends Account {
             'allowedUsage' => $this->bundlesize,
             'accountProfileId' => $this->productObj->getId(),
             'isActive' => true,
-            'radiusClass' => 'N|U|10240|0|0|0|31|0',
+            'radiusClass' => 'N|S|10240|0|0|0|31|0',
             'radiusProfile' => 'normal',
             'radiusCallingStationId' => (isset($this->callingstation) ? $this->callingstation : '')
         );
@@ -42,7 +42,7 @@ class Account_rux extends Account {
         $adsl_service->loadMethod('account', 'create');
         $result = $adsl_service->call_method($createObj);
         if ($result['responseCode'] != 'COMPLETED')
-            throw new Exception("Error creating account: " . $result['message']);
+            throw new Exception($result['message']);
         $this->id = $result['account']['id'];
         $this->accountId = $this->id;
         $adsl_service->loadMethod('account', 'addattribute');
@@ -224,6 +224,7 @@ class Account_rux extends Account {
                         $result = $adsl_service->call_method($updateObj);
                         if ($result['responseCode'] == VoxADSL::FAILED)
                             throw new Exception("Error encountered updating customer reference: " . $result['message']);
+                        $this->description = $value;
                         break;
                     case 'status':
                         $loginId = $GLOBALS['login']->getLoginId();
@@ -243,6 +244,7 @@ class Account_rux extends Account {
                         $result = $adsl_service->call_method($updateObj);
                         if ($result['responseCode'] == VoxADSL::FAILED)
                             throw new Exception("Error encountered updating status: " . $result['message']);
+                        $this->status = strtoupper($value);
                         break;
                     case 'notifycell':
                     case 'notifyemail':
@@ -295,7 +297,7 @@ class Account_rux extends Account {
                     if ($cache->load()) {
                         $templist = $cache->getData();
                         $templist->removeItem($this->id);
-                        $this->read($this->id);
+                        //$this->read($this->id);
                         $templist->addItem($this, $this->id);
                         $cache->save($templist);
                     }
@@ -481,13 +483,15 @@ class AccountList_rux extends AccountList {
         foreach ($orderedlist as $key => $value)
             array_push($newlist, $value);
         $this->list = new Collection($newlist);
-
+/*
         if ($offset > 0 or $limit > 0) {
             $list_full = $this->list->getAll();
             $list_slice = array_slice($list_full, $offset, $limit);
             $list = new Collection($list_slice);
             return $list;
         }
+ * 
+ */
         $this->count = $this->list->count();
 
         return $this->list;

@@ -3,7 +3,7 @@
     <head>
         <title>{$title|default:"no title"}</title>
 
-        <link rel = 'stylesheet' href = '/css/default.css' type = 'text/css' />
+        <link rel = 'stylesheet' href = '/css/themes/{$theme}/default.css' type = 'text/css' />
         <link rel = 'stylesheet' href = '/css/validation.css' type = 'text/css' />
         <link rel = 'stylesheet' href = '/css/formwizard.css' type = 'text/css' />
         <link rel = 'stylesheet' href = '/css/jquery-ui.css' type = 'text/css' />
