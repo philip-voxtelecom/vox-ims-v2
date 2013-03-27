@@ -15,6 +15,10 @@ $config->provider = 'rux';
 //Default view
 $config->view = 'ims';
 
+$config->adsl_model_provider = 'rux';
+$config->adsl_view_provider = $config->view;
+$config->adsl_control_provider = 'rux';
+
 // Global defaults. Localise in local_config.php. This will make upgrading easier
 // set the documentroot for the application
 $config->documentroot = $GLOBALS['documentroot'];
@@ -35,6 +39,8 @@ $config->cacheExpiryTime = 14400;
 // This is un used
 // $config->cachetype = 'mysqli';
 
+//$config->svlogparser_url = 'http://api.voxtelecom.co.za';
+//$config->svlogparser_version = '2';
 
 if (is_readable($GLOBALS['documentroot'] . '/configs/local_config.php')) {
     include $GLOBALS['documentroot'] . '/configs/local_config.php';

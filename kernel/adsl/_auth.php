@@ -4,7 +4,7 @@ class accountAuth {
 
     private $login;
     private $admin = false;
-    private $loginId;
+    private $loginId = false;
     private $userMap = array();
     private $dbh;
 
@@ -49,7 +49,7 @@ class accountAuth {
     /* map the logged in user to an ADSL system user */
 
     protected function loadUserMap($user) {
-        $query = "select * from usermap where loginuser='$user'";
+        $query = "select a.mappeduser, a.loginuser, a.status as userstatus, b.status as resellerstatus from usermap a, owners b where loginuser='$user' and a.mappeduser=b.login";
         if ($GLOBALS['config']->adsl_meta_dbtype == 'mysqli') {
             $result = $this->dbh->query($query);
             $row = $result->fetch_assoc();
@@ -57,7 +57,13 @@ class accountAuth {
             throw new Exception("Unsupported DB type for adsl_meta_dbtype");
         }
         if (!empty($row)) {
-            $this->userMap[$row['loginuser']] = $row['mappeduser'];
+            if ($row['resellerstatus'] != 'active') {
+                throw new Exception("Reseller account is not active for ADSL module");
+            } elseif ($row['userstatus'] != 'active') {
+                throw new Exception("User account is not active for ADSL module");
+            } else {
+                $this->userMap[$row['loginuser']] = $row['mappeduser'];
+            }
         } else {
             throw new Exception("No ADSL user map found for $user");
         }
@@ -67,5 +73,10 @@ class accountAuth {
 
 //$login = new accountAuth($_SERVER['PHP_AUTH_USER']);
 // TODO is this right?
-$login = new accountAuth($_SESSION['name']);
+try {
+    $login = new accountAuth($_SESSION['name']);
+} catch (Exception $e) {
+    $login = false;
+    $GLOBALS['adsl_notification'] = $e->getMessage();
+}
 ?>

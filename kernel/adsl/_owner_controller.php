@@ -35,7 +35,7 @@ class OwnerController {
         try {
             $this->owner->create();
         } catch (Exception $e) {
-            throw new Exception("Error creating owner: " . $e->getMessage());
+            throw new Exception("Error creating reseller: " . $e->getMessage());
         }
         return $this->owner->id();
     }
@@ -46,12 +46,17 @@ class OwnerController {
 
         if (empty($this->owner))
             $this->owner = OwnerFactory::Create();
-        return $this->owner->read($id);
+        try {
+            $this->owner->read($id);
+        } catch (Exception $e) {
+            
+        }
+        return $this->owner->getAttributes(); 
     }
 
     public function update($parameters) {
         if (empty($this->owner))
-            throw new Exception("No owner loaded for update");
+            throw new Exception("No reseller loaded for update");
         //todo check parameters
         $this->owner->update($parameters);
     }
@@ -65,7 +70,7 @@ class OwnerController {
                 $this->owner = OwnerFactory::Create();
                 $this->owner->read($id);
             } catch (Exception $e) {
-                throw new Exception("Could not load owner for delete: " . $e->getMessage());
+                throw new Exception("Could not load reseller for delete: " . $e->getMessage());
             }
         }
 
@@ -73,9 +78,16 @@ class OwnerController {
             $this->owner->delete();
             unset($this->owner);
         } catch (Exception $e) {
-            throw new Exception("Problem encountered deleting account");
+            throw new Exception("Problem encountered deleting reseller");
         }
         return TRUE;
+    }
+    
+    public function realms() {
+        if (empty($this->owner))
+            throw new Exception("No reseller loaded");
+        
+        return $this->owner->getRealms();
     }
 
 }

@@ -5,8 +5,8 @@ require_once($GLOBALS['documentroot'] . '/classes/View.class.php');
 require_once('_account_model.php');
 require_once('_usage_model.php');
 
-if (file_exists($GLOBALS['documentroot'] . '/Views/' . $GLOBALS['module'] . '/' . $GLOBALS['config']->view . '/_report_view.php')) {
-    include($GLOBALS['documentroot'] . '/Views/' . $GLOBALS['module'] . '/' . $GLOBALS['config']->view . '/_report_view.php');
+if (file_exists($GLOBALS['documentroot'] . '/Views/' . $GLOBALS['module'] . '/' . $GLOBALS['config']->adsl_view_provider . '/_report_view.php')) {
+    include($GLOBALS['documentroot'] . '/Views/' . $GLOBALS['module'] . '/' . $GLOBALS['config']->adsl_view_provider . '/_report_view.php');
 }
 
 class ReportView extends View {

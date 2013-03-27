@@ -18,6 +18,6 @@
     </form>
 </div>
 <button type="button" class="detailButton"
-        onclick="this.style.visibility='hidden';xajax_accountSubmit('update',xajax.getFormValues('accountStatusUpdateForm'));">
+        onclick="xajax_accountSubmit('update',xajax.getFormValues('accountStatusUpdateForm'));">
     Apply Status
 </button>

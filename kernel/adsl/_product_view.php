@@ -4,8 +4,8 @@ require_once($GLOBALS['documentroot'] . '/classes/View.class.php');
 
 require_once('_product_model.php');
 
-if (file_exists($GLOBALS['documentroot'] . '/Views/' . $GLOBALS['module'] . '/' . $GLOBALS['config']->view . '/_product_view.php')) {
-    include($GLOBALS['documentroot'] . '/Views/' . $GLOBALS['module'] . '/' . $GLOBALS['config']->view . '/_product_view.php');
+if (file_exists($GLOBALS['documentroot'] . '/Views/' . $GLOBALS['module'] . '/' . $GLOBALS['config']->adsl_view_provider . '/_product_view.php')) {
+    include($GLOBALS['documentroot'] . '/Views/' . $GLOBALS['module'] . '/' . $GLOBALS['config']->adsl_view_provider . '/_product_view.php');
 }
 
 class ProductView extends View {
@@ -17,40 +17,69 @@ class ProductView extends View {
     public function listall() {
         $arg_list = func_get_args();
 
-        $productList = ProductListFactory::Create();
-        $productList->getList();
+        $productList = new ProductController();
+        $list = $productList->listall();
 
-        $viewobject = new SimpleXMLElement('<root/>');
-        $data = $viewobject->addChild('data');
-        foreach ($productList->getList() as $product) {
-            append_simplexml($data, $product->asXML());
-        }
-
-        $products = array();
-
-        foreach ($viewobject->data->children() as $element) {
-            $id = (string) $element->id;
-            $product = array();
-            foreach ($element->children() as $param) {
-                $product[$param->getName()] = (string) $param;
-            }
-            array_push($products, $product);
-        }
-        return $products;
+        return $list;
     }
 
     public function read($id) {
-        $product = ProductFactory::Create();
-        $product->read($id);
-        return $product->members();
+        
+        $product = new ProductController();
+        //$product->read($id);
+        return $product->read($id);
     }
 
     public function options() {
         return ProductFactory::Create()->options();
     }
+
 }
 
 class ProductViewFactory {
+
+    public static function Create($productList=null) {
+        $required_class = "ProductView_" . $GLOBALS['config']->view;
+        if (class_exists($required_class)) {
+            return new $required_class($productList);
+        } else {
+            return new ProductView($productList);
+        }
+    }
+
+}
+/*
+ * 
+ * 
+ * 
+ * 
+ */
+class ProductGroupView extends View {
+
+    public function display($viewarray = NULL) {
+        ;
+    }
+    
+    public function read($uid) {
+        $product = new ProductController();
+        $group = $product->readGroup($uid);
+        return $group;
+    }
+    
+    public function listall() {
+        $product = new ProductController();
+        $groups = $product->listGroups();
+        return $groups;
+    }
+    
+    public function viewproducts($id) {
+        $product = new ProductController();
+        $groupProducts = $product->listGroupProducts($id);
+        return $groupProducts;
+    }
+}
+
+class ProductGroupViewFactory {
 
     public static function Create($productList=null) {
         $required_class = "ProductView_" . $GLOBALS['config']->view;

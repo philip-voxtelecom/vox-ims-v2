@@ -2,6 +2,10 @@
 
 require_once($GLOBALS['documentroot'] . '/classes/View.class.php');
 
+if (file_exists($GLOBALS['documentroot'] . '/Views/' . $GLOBALS['module'] . '/' . $GLOBALS['config']->adsl_view_provider . '/_common_view.php')) {
+    include($GLOBALS['documentroot'] . '/Views/' . $GLOBALS['module'] . '/' . $GLOBALS['config']->adsl_view_provider . '/_common_view.php');
+}
+
 class Error extends View {
 
     public function display($viewarray = NULL) {

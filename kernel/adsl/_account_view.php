@@ -4,8 +4,8 @@ require_once($GLOBALS['documentroot'] . '/classes/View.class.php');
 
 require_once('_account_model.php');
 
-if (file_exists($GLOBALS['documentroot'] . '/Views/' . $GLOBALS['module'] . '/' . $GLOBALS['config']->view . '/_account_view.php')) {
-    include($GLOBALS['documentroot'] . '/Views/' . $GLOBALS['module'] . '/' . $GLOBALS['config']->view . '/_account_view.php');
+if (file_exists($GLOBALS['documentroot'] . '/Views/' . $GLOBALS['module'] . '/' . $GLOBALS['config']->adsl_view_provider . '/_account_view.php')) {
+    include($GLOBALS['documentroot'] . '/Views/' . $GLOBALS['module'] . '/' . $GLOBALS['config']->adsl_view_provider . '/_account_view.php');
 }
 
 class AccountView extends View {
@@ -105,7 +105,9 @@ class AccountView extends View {
 
         $account = new AccountController();
         $account->read($userId);
+        return $account->getAttributes();
 
+        /*
         $viewobject = new ViewObject('<root/>');
         $data = $viewobject->addChild('data');
         $data->addChild('id', $userId);
@@ -115,6 +117,8 @@ class AccountView extends View {
             }
         }
         return $viewobject->asXML();
+         * 
+         */
     }
 
     public function delete($viewarray = NULL) {

@@ -142,6 +142,12 @@ abstract class Owner {
         return $this->members;
     }
 
+    public function getAttributes() {
+        $attributes = $this->members;
+        $attributes['id'] = $this->id;
+        return $attributes;
+    }
+
     /*
       public function getId() {
       return $this->id;
@@ -196,7 +202,7 @@ abstract class Owner {
 
         if (!isset($this->id))
             throw new Exception("No owner object loaded");
-        $query = "select realm, status from realms a, ownerRealm b where b.owner_id='$this->id' and a.id=b.realm_id";
+        $query = "select a.realm, a.status as status, b.status as rstatus from realms a, ownerRealm b where b.owner_id='$this->id' and a.id=b.realm_id";
         $result = $this->dbh->query($query);
         if (!$result) {
             throw new Exception("Could not get owner realms");
@@ -266,7 +272,7 @@ class OwnerList {
 class OwnerFactory {
 
     public static function Create() {
-        $required_class = "Owner_" . $GLOBALS['config']->provider;
+        $required_class = "Owner_" . $GLOBALS['config']->adsl_model_provider;
         if (class_exists($required_class)) {
             return new $required_class();
         } else {

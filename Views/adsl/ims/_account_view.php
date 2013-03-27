@@ -25,6 +25,7 @@ function accountSubmit($submitrequest, $data) {
 class AccountView_ims extends AccountView {
 
     protected $xajax;
+    protected $meta;
 
     public function __construct($viewobject = null) {
         $this->xajax = new xajaxResponse();
@@ -94,6 +95,10 @@ class AccountView_ims extends AccountView {
         //$account = AccountFactory::Create();
         $account = new AccountController();
         $account->read($accountId);
+        
+        $productObj = new ProductController();
+        $product = $productObj->read($account->product());
+        
         $viewobject = new ViewObject('<root/>');
         $data = $viewobject->addChild('data');
         append_simplexml($data, $account->asXML());
@@ -105,6 +110,11 @@ class AccountView_ims extends AccountView {
             $menuitem = $menu2->addChild('menuitem');
             $menuitem->addChild('face', 'Create account');
             $menuitem->addChild('action', "xajax_accountView('create',{});");
+        }
+        if ($GLOBALS['auth']->checkAuth('adsl_account', AUTH_READ)) {
+            $menuitem = $menu2->addChild('menuitem');
+            $menuitem->addChild('face', 'Return to list');
+            $menuitem->addChild('action', "xajax_accountView('listall',{search: '$this->search'});");
         }
 
         $menu1 = $viewobject->addChild('menu');
@@ -132,11 +142,12 @@ class AccountView_ims extends AccountView {
          */
 
         //if ($GLOBALS['auth']->checkAuth('adsl_account', AUTH_UPDATE) and $viewobject->data->account->status != "cancelled" and $ownerproduct->topupable == 'yes') {
-        if ($GLOBALS['auth']->checkAuth('adsl_account', AUTH_UPDATE) and $viewobject->data->account->status != "cancelled") {
-            $menuitem = $menu1->addChild('menuitem');
-            $menuitem->addChild('face', 'Top up Account');
-            $menuitem->addChild('action', "xajax_accountView('topup',{id: $accountId,offset: $this->offset, limit: $this->limit, search: '$this->search'});");
-        }
+          if ($GLOBALS['auth']->checkAuth('adsl_account', AUTH_UPDATE) and $viewobject->data->account->status != "cancelled" and $product['isTopupable']==1) {
+          $menuitem = $menu1->addChild('menuitem');
+          $menuitem->addChild('face', 'Top up Account');
+          $menuitem->addChild('action', "xajax_accountView('topup',{id: $accountId,offset: $this->offset, limit: $this->limit, search: '$this->search'});");
+          }
+
 
         if ($GLOBALS['auth']->checkAuth('adsl_account', AUTH_UPDATE) and ( $viewobject->data->account->status != "cancelled" or $GLOBALS['login']->isAdmin())) {
             $menuitem = $menu1->addChild('menuitem');
@@ -194,7 +205,8 @@ class AccountView_ims extends AccountView {
         $content = $this->smarty->fetch('accountActions.tpl');
 
         $this->xajax->assign('right_bar', 'innerHTML', $content);
-        //$this->xajax->append('right_bar','innerHTML',"<pre>".print_r($viewobject,true)."</pre>");
+        $this->detail($viewarray);
+        //$this->xajax->script("xajax_accountView('detail',{id:$accountId});");
         return $this->xajax;
     }
 
@@ -209,10 +221,18 @@ class AccountView_ims extends AccountView {
         $product = ProductFactory::Create();
         $product->read($account->product());
 
-        $viewobject = new ViewObject('<root></root>');
-        $data = $viewobject->addChild('data');
-        append_simplexml($data, $account->asXML());
-        append_simplexml($data, $product->asXML());
+
+        /*
+          $viewobject = new ViewObject('<root></root>');
+          $data = $viewobject->addChild('data');
+          append_simplexml($data, $account->asXML());
+          append_simplexml($data, $product->asXML());
+         * 
+         */
+
+        $viewobject = array();
+        $viewobject['data']['product'] = $product->getAttributes();
+        $viewobject['data']['account'] = $account->getAttributes();
 
         $this->smarty->assign('viewobject', $viewobject);
         $content = $this->smarty->fetch('accountDetails.tpl');
@@ -222,24 +242,28 @@ class AccountView_ims extends AccountView {
     }
 
     public function create($viewarray = NULL) {
-        $productlist = new ProductView(NULL);
+        $productlist = new ProductController();
         $owner = OwnerViewFactory::Create();
         $realms = $owner->realms($GLOBALS['login']->getLoginId());
         $account = new AccountController();
         $accountoptions = $account->options();
 
+        $this->meta['action'] = 'create';
+
+        $this->smarty->assign('meta', $this->meta);
         $this->smarty->assign('accountoptions', $accountoptions);
-        $accountdetail = $this->smarty->fetch('accountDetail.tpl');
-        $this->smarty->assign('accountDetail', $accountdetail);
+        //$accountdetail = $this->smarty->fetch('accountDetail.tpl');
+        //$this->smarty->assign('accountDetail', $accountdetail);
         $this->smarty->assign('productlist', $productlist->listall());
+        $this->smarty->assign('productgroups', $productlist->listGroups());
         $this->smarty->assign('productoptions', $productlist->options());
         $this->smarty->assign('realms', $realms);
-        $content = $this->smarty->fetch('accountCreate.tpl');
+        $content = $this->smarty->fetch('accountMAC.tpl');
         $this->xajax->assign("content", "innerHTML", $content);
         $this->xajax->assign("right_bar", "innerHTML", "");
         $this->xajax->script("
             var myform=new formtowizard({
-               formid: 'accountCreateForm',
+               formid: 'accountMACForm',
                persistsection: false,
                revealfx: ['none', 500],
                onpagechangestart:function($, i, \$fieldset){
@@ -272,32 +296,40 @@ class AccountView_ims extends AccountView {
         $account = new AccountController();
         $account->read($accountId);
         $accountoptions = $account->options();
+        
+        $product = new ProductController();
+        $productdetail = $product->read($account->product());
+        error_log(json_encode($productdetail));
 
+        $this->meta['action'] = 'update';
 
-
-        $productlist = new ProductView(NULL);
+        $productlist = new ProductController();
+        $productgroup = $productlist->getProductGroup($account->product());
 
         $viewobject = new ViewObject('<root></root>');
         $data = $viewobject->addChild('data');
         append_simplexml($data, $account->asXML());
         $viewobject->addChild('action', 'update');
-
+        $this->smarty->assign('meta', $this->meta);
         $this->smarty->assign('viewobject', $viewobject);
         $this->smarty->assign('accountoptions', $accountoptions);
+        $this->smarty->assign('productlist', $productlist->listGroupProducts($productgroup));
         $this->smarty->assign('productoptions', $productlist->options());
-        $accountdetail = $this->smarty->fetch('accountDetail.tpl');
-        $productdetail = $this->smarty->fetch('accountProduct.tpl');
-        $this->smarty->assign('accountDetail', $accountdetail);
+        //$accountdetail = $this->smarty->fetch('accountDetail.tpl');
+        //$productdetail = $this->smarty->fetch('accountProduct.tpl');
+        //$this->smarty->assign('accountDetail', $accountdetail);
         $this->smarty->assign('accountProduct', $productdetail);
         $this->smarty->assign("offset", "$this->offset");
         $this->smarty->assign("limit", $this->limit);
         $this->smarty->assign("search", $this->search);
-        $content = $this->smarty->fetch('accountUpdate.tpl');
+        //$content = $this->smarty->fetch('accountUpdate.tpl');
+        $content = $this->smarty->fetch('accountMAC.tpl');
+
         $this->xajax->assign("content", "innerHTML", $content);
         $this->xajax->assign("right_bar_content", "innerHTML", "");
         $this->xajax->script("
             var myform=new formtowizard({
-               formid: 'accountUpdateForm',
+               formid: 'accountMACForm',
                persistsection: false,
                revealfx: ['none', 500],
                onpagechangestart:function($, i, \$fieldset){
@@ -322,6 +354,67 @@ class AccountView_ims extends AccountView {
         return $this->xajax;
     }
 
+    /*
+      public function edit($viewarray = NULL) {
+      $accountId = $viewarray['id'];
+
+      $this->setPage($viewarray);
+
+      $account = new AccountController();
+      $account->read($accountId);
+      $accountoptions = $account->options();
+
+      $productlist = new ProductController();
+
+      $viewobject = new ViewObject('<root></root>');
+      $data = $viewobject->addChild('data');
+      append_simplexml($data, $account->asXML());
+      $viewobject->addChild('action', 'update');
+
+      $this->smarty->assign('viewobject', $viewobject);
+      $this->smarty->assign('accountoptions', $accountoptions);
+      $this->smarty->assign('productoptions', $productlist->options());
+      $accountdetail = $this->smarty->fetch('accountDetail.tpl');
+      $productdetail = $this->smarty->fetch('accountProduct.tpl');
+      $this->smarty->assign('accountDetail', $accountdetail);
+      $this->smarty->assign('accountProduct', $productdetail);
+      $this->smarty->assign("offset", "$this->offset");
+      $this->smarty->assign("limit", $this->limit);
+      $this->smarty->assign("search", $this->search);
+      //$content = $this->smarty->fetch('accountUpdate.tpl');
+      $content = $this->smarty->fetch('accountUpdate.tpl');
+
+      $this->xajax->assign("content", "innerHTML", $content);
+      $this->xajax->assign("right_bar_content", "innerHTML", "");
+      $this->xajax->script("
+      var myform=new formtowizard({
+      formid: 'accountUpdateForm',
+      persistsection: false,
+      revealfx: ['none', 500],
+      onpagechangestart:function($, i, \$fieldset){
+      var validated=true
+      var fieldset=\$fieldset.get(0)
+      var allels=fieldset.getElementsByTagName('input')
+      for (var i=0; i<allels.length; i++){
+      var valid = Validation.validate(allels[i].getAttribute('id'))
+      //alert(allels[i].getAttribute('id'))
+      if (!valid) validated=false
+      }
+      var allels2=fieldset.getElementsByTagName('select')
+      for (var i=0; i<allels2.length; i++){
+      var valid = Validation.validate(allels2[i].getAttribute('id'))
+      //alert(allels2[i].getAttribute('id'))
+      if (!valid) validated=false
+      }
+      return validated
+      }
+      })
+      ");
+      return $this->xajax;
+      }
+     * 
+     */
+
     public function status($viewarray = NULL) {
         $viewobject = new ViewObject(parent::status($viewarray));
 
@@ -338,14 +431,19 @@ class AccountView_ims extends AccountView {
     }
 
     public function topup($viewarray = NULL) {
-        $viewobject = new ViewObject(parent::topup($viewarray));
+        //$viewobject = new ViewObject(parent::topup($viewarray));
+        //$this->setPage($viewarray);
+        $account = parent::topup($viewarray);
+        error_log(json_encode($account));
 
-        $this->setPage($viewarray);
+        //$this->smarty->assign("viewobject", $viewobject);
+        //$this->smarty->assign("offset", "$this->offset");
+        //$this->smarty->assign("limit", $this->limit);
+        //$this->smarty->assign("search", $this->search);
+        //$content = $this->smarty->fetch('accountTopup.tpl');
+        
+        $this->smarty->assign("account", $account);
 
-        $this->smarty->assign("viewobject", $viewobject);
-        $this->smarty->assign("offset", "$this->offset");
-        $this->smarty->assign("limit", $this->limit);
-        $this->smarty->assign("search", $this->search);
         $content = $this->smarty->fetch('accountTopup.tpl');
         $this->xajax->assign("content", "innerHTML", $content);
         //return Error("<pre><xmp>".print_r($viewobject->asXML(),true)."</xmp></pre>");
@@ -401,7 +499,7 @@ class AccountView_ims extends AccountView {
         try {
             $viewobject = parent::dailyUsageDetail($viewarray);
         } catch (Exception $e) {
-            $this->xajax->script("alert('No usage found');");
+            $this->xajax->script("alert('No sessions found');");
             return $this->xajax;
         }
 
@@ -487,7 +585,7 @@ class AccountView_ims extends AccountView {
         $init = '';
         if (isset($viewarray['init']))
             $init = ", init: true";
-        
+
         $this->xajax->script("xajax_accountView('listall',{offset: $this->offset, limit: $this->limit, search: '$this->search' $init});");
         //$this->xajax->script("xajax_accountView('detail',{id: $accountId,offset: $offset, limit: $limit, search: '$search'});");
         return $this->xajax;
@@ -635,6 +733,8 @@ class AccountSubmit_ims {
                 $params['callingstation'] = $formdata['_save_callingstation'];
             if (isset($formdata['_save_mailreport']) and $formdata['_save_mailreport'] != $properties['mailreport'])
                 $params['mailreport'] = $formdata['_save_mailreport'];
+            if (isset($formdata['product']) and $formdata['product'] != $account->product())
+                $params['product'] = $formdata['product'];
             $id = $account->update($params);
         } catch (Exception $e) {
             $view = new AccountView_ims($viewobject->asXML());

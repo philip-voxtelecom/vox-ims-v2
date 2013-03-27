@@ -8,9 +8,9 @@ require_once($GLOBALS['documentroot'] . '/classes/View.class.php');
 
 require_once('_owner_model.php');
 
-if (file_exists($GLOBALS['documentroot'] . '/Views/' . $GLOBALS['module'] .'/'. $GLOBALS['config']->view . '/_owner_view.php')) {
+if (file_exists($GLOBALS['documentroot'] . '/Views/' . $GLOBALS['module'] .'/'. $GLOBALS['config']->adsl_view_provider . '/_owner_view.php')) {
     
-    include($GLOBALS['documentroot'] . '/Views/' . $GLOBALS['module'] .'/'. $GLOBALS['config']->view . '/_owner_view.php');
+    include($GLOBALS['documentroot'] . '/Views/' . $GLOBALS['module'] .'/'. $GLOBALS['config']->adsl_view_provider . '/_owner_view.php');
 }
 
 class OwnerView extends View {

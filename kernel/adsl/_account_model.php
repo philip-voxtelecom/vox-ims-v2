@@ -17,7 +17,7 @@ abstract class Account {
     protected $ownerObj;
 
     public function __sleep() {
-        return array('id', 'members');
+        return array('id', 'members', 'product', 'owner', 'productObj', 'ownerObj');
     }
 
     public function __set($name, $value) {
@@ -65,6 +65,7 @@ abstract class Account {
         $data->addChild('id', $this->id);
         $data->addChild('productId', $this->product);
         foreach ($this->members as $member => $value) {
+            $value = (string) $value;
             $data->addChild($member, htmlspecialchars($value));
         }
 
@@ -124,6 +125,13 @@ abstract class Account {
         $this->ownerObj = $id;
     }
 
+    public function getAttributes() {
+        $attributes = $this->members;
+        $attributes['id'] = $this->id;
+        $attributes['productId'] = $this->product;
+        return $attributes;
+    }
+
     public function properties() {
         $properties = $this->members;
         $properties['productId'] = $this->product;
@@ -139,10 +147,10 @@ abstract class AccountList {
     protected $count;
     protected $countall;
 
-    //protected $dbh;
+//protected $dbh;
 
     function __construct() {
-        //$this->dbh = MetaDatabaseConnection::get('accountlist')->handle();
+//$this->dbh = MetaDatabaseConnection::get('accountlist')->handle();
         return $this->getList();
     }
 
@@ -165,7 +173,7 @@ abstract class AccountList {
 class AccountFactory {
 
     public static function Create() {
-        $required_class = "Account_" . $GLOBALS['config']->provider;
+        $required_class = "Account_" . $GLOBALS['config']->adsl_model_provider;
         if (class_exists($required_class)) {
             return new $required_class();
         } else {
@@ -178,7 +186,7 @@ class AccountFactory {
 class AccountListFactory {
 
     public static function Create() {
-        $required_class = "AccountList_" . $GLOBALS['config']->provider;
+        $required_class = "AccountList_" . $GLOBALS['config']->adsl_model_provider;
         if (class_exists($required_class)) {
             return new $required_class();
         } else {

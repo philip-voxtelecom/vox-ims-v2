@@ -23,7 +23,7 @@
             <div id="form_controls">
                 <table class="detailTable">
                     <tr >
-                        <td class="label" onclick="togglePrint(this.parentNode);">Reference</td><td class="detail" id="name_detail"></td>
+                        <td class="label" onclick="togglePrint(this.parentNode);">Description</td><td class="detail" id="name_detail"></td>
                     </tr>
                     <tr >
                         <td class="label" onclick="togglePrint(this.parentNode);">Password</td><td class="detail" id="password_detail" id="password_detail"></td>
@@ -34,7 +34,7 @@
                     </tr>
                     -->
                     <tr>
-                        <td class="label" onclick="togglePrint(this.parentNode);">Email</td><td class="detail" id="email_detail"></td>
+                        <td class="label" onclick="togglePrint(this.parentNode);">Email Address</td><td class="detail" id="email_detail"></td>
                     </tr>
                     <!--
                     <tr>

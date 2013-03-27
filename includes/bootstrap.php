@@ -2,6 +2,8 @@
 
 require_once $GLOBALS['documentroot'] . '/classes/Auth.class.php';
 require_once $GLOBALS['documentroot'] . '/classes/Collection.class.php';
+require_once $GLOBALS['documentroot'] . '/classes/UUID.class.php';
+
 
 if (!isset($_SERVER['PHP_AUTH_USER'])) {
     define('AUTH', false);

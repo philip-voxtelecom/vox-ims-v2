@@ -24,20 +24,26 @@ class AccountController {
             'mandatory' => TRUE,
             'validation' => ''
         ),
-        'bundlesize' => array(
-            'mandatory' => TRUE,
-            'validation' => ''
-        )
+            /*
+              'bundlesize' => array(
+              'mandatory' => TRUE,
+              'validation' => ''
+              )
+             * 
+             */
     );
     private $allowed_update_params = array(
         'password' => array(
             'mandatory' => TRUE,
             'validation' => ''
         ),
-        'bundlesize' => array(
-            'mandatory' => TRUE,
-            'validation' => ''
-        )
+            /*
+              'bundlesize' => array(
+              'mandatory' => TRUE,
+              'validation' => ''
+              )
+             * 
+             */
     );
 
     public function __construct() {
@@ -101,9 +107,9 @@ class AccountController {
             $this->account->update(array('notifycell' => $this->account->notifycell));
         if (isset($this->account->notifyemail))
             $this->account->update(array('notifyemail' => $this->account->notifyemail));
-        if (isset($this->account->mailreport))
+        if (isset($this->account->mailreport) and $this->account->mailreport != 'never')
             $this->account->update(array('mailreport' => $this->account->mailreport));
-        if (isset($this->account->callingstation))
+        if (isset($this->account->callingstation) and !empty($this->account->callingstation))
             $this->account->update(array('callingstation' => $this->account->callingstation));
 
         $time = microtime(true) - $time_start;
@@ -140,12 +146,12 @@ class AccountController {
             throw new Exception("No account loaded for update");
         array_push($auditdata, $this->account->id());
 
-/*
-        foreach ($parameters as $key => $update) {
-            error_log("$key = $update");
-        }
- * 
- */
+        /*
+          foreach ($parameters as $key => $update) {
+          error_log("$key = $update");
+          }
+         * 
+         */
 
 
         $this->account->update($parameters);
@@ -281,6 +287,12 @@ class AccountController {
         if (!$GLOBALS['auth']->checkAuth('adsl_account', AUTH_READ))
             throw new Exception('Access Denied');
         return $this->account->asXML();
+    }
+
+    public function getAttributes() {
+        if (!$GLOBALS['auth']->checkAuth('adsl_account', AUTH_READ))
+            throw new Exception('Access Denied');
+        return $this->account->getAttributes();
     }
 
     public function options() {

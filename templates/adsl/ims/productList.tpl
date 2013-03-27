@@ -10,18 +10,5 @@
         <td id="productlist_data5">{$products[name].status}</td>
     </tr>
 	{/section}
-    <tr class="empty"><td colspan="5">&nbsp;</td></tr>
-    <tr class="empty">
-        <td colspan="5" style="text-align:center;">
-        {if $offset == 0 and $count > $rowlimit}
-            <a href="#" onclick="xajax_displayProducList('{$search}',{$offset+$rowlimit});">Next page &gt;&gt;</a>
-        {elseif $count > $rowlimit}
-            <a href="#" onclick="xajax_displayProductList('{$search}',{$offset-$rowlimit});">&lt;&lt; Previous page</a>
-            &nbsp;|&nbsp;
-            <a href="#" onclick="xajax_displayProductList('{$search}',{$offset+$rowlimit});" >Next page &gt;&gt;</a>
-        {elseif $offset > 0 and $count <= $rowlimit}
-            <a href="#" onclick="xajax_displayProductList('{$search}',{$offset-$rowlimit});">&lt;&lt; Previous page</a>
-        {/if}
-        </td>
-    </tr>
+
 </table>

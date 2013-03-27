@@ -18,7 +18,7 @@ abstract class Usage {
 class UsageFactory {
 
     public static function Create() {
-        $required_class = "Usage_" . $GLOBALS['config']->provider;
+        $required_class = "Usage_" . $GLOBALS['config']->adsl_model_provider;
         if (class_exists($required_class)) {
             return new $required_class();
         } else {

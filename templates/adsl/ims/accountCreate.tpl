@@ -8,20 +8,45 @@
 
         <fieldset class="sectionwrap">
             <legend>Product Setup</legend>
-            <div id="product_option">
+            <div id="product_group">
                 <div class="form-row">
-                    <div class="field-label"><label for="_save_product">Product</label>:</div>
-                    <select name="product" id="product" class="validate-selection" onchange="xajax.$('product_detail').innerHTML=this.options[this.selectedIndex].text;">
+                    <div class="field-label"><label for="productgroup">Product Group</label>:</div>
+                    <select name="productgroup" id="productgroup" class="validate-selection" onchange="
+                        xajax.$('productgroup_detail').innerHTML=this.options[this.selectedIndex].text;
+                        jQuery('input[name=_save_user]').prop('value','');
+                        jQuery('input[name=_save_username]').prop('value','');
+                        jQuery('input[name=_save_user]').prop('disabled',true);
+                        var groupid=$(this).value;
+                        var ret = xajax_productGroupView('viewproducts',
+                            {ldelim}
+                                id: groupid, 
+                                as: 'select', 
+                                target: 'productlistTarget', 
+                                name: 'product', 
+                                class: 'validate-selection', 
+                                onchange: 'if ($(this).value == \'null\') {ldelim} jQuery(\'input[name=_save_user]\').prop(\'disabled\',true); return; {rdelim} else {ldelim} jQuery(\'input[name=_save_user]\').prop(\'disabled\',false); {rdelim};var id=$(this).value; var ret = xajax_productView(\'read\',{ldelim}id: id,value: \'realm\',target: \'_save_realm\'{rdelim});xajax.$(\'product_detail\').innerHTML=this.options[this.selectedIndex].text;'
+                            {rdelim});
+                        ">
                         <option value="null">Please select</option>
-                        {section name=product loop=$productlist}
-                            {if $productlist[product].status|lower == 'active'}
-                                <option label="{$productlist[product].description}" value="{$productlist[product].id}">{$productlist[product].description}</option>
+                        {section name=productgroup loop=$productgroups}
+                            {if $productgroups[productgroup].status|lower == 'active'}
+                                <option label="{$productgroups[productgroup].name}" value="{$productgroups[productgroup].id}">{$productgroups[productgroup].name}</option>
                             {/if}
                         {/section}
-
                     </select>
                 </div>
             </div>
+            <div id="product_option">
+                <div class="form-row">
+                    <div class="field-label"><label for="_save_product">Product</label>:</div>
+                    <div id='productlistTarget'>
+                    <select name="product" id="product" class="validate-selection" onchange="xajax.$('product_detail').innerHTML=this.options[this.selectedIndex].text;">
+                        <option value="null">Please select product group above</option>
+                    </select>
+                    </div>
+                </div>
+            </div>
+            <!--            
             <div class="form-row">
                 <div class="field-label"><label for="_save_realm">Realm</label>:</div>
                 <div class="field-widget">
@@ -36,9 +61,11 @@
                     </select>
                 </div>
             </div>
+            -->
+            <input type="hidden" name="_save_realm" id="_save_realm" value=""/>
             <div class="form-row">
                 <div class="field-label"><label for="_save_user">Username</label>:</div>
-                <div class="field-widget"><input value="" name="_save_user" id="_save_user" class="required  validate-alphanum" style="width:340px;" title="Username to create" 
+                <div class="field-widget"><input value="" name="_save_user" id="_save_user" class="required  validate-alphanum" style="width:340px;" title="Username to create" disabled="disabled"
                                                  onkeyup="Validation.reset('isUsernameAvailable');xajax.$('_save_username').value=this.value+'@'+xajax.$('_save_realm').value;xajax.$('username_detail').innerHTML=xajax.$('_save_username').value;"/></div>
             </div>
             <div class="form-row">
@@ -80,6 +107,9 @@
                 <table class="detailTable">
                     <tr >
                         <td class="label" onclick="togglePrint(this.parentNode);">Account Description</td><td class="detail" id="name_detail"></script></td>
+                    </tr>
+                    <tr>
+                        <td class="label" onclick="togglePrint(this.parentNode);">Product Group</td><td class="detail" id="productgroup_detail"></td>
                     </tr>
                     <tr>
                         <td class="label" onclick="togglePrint(this.parentNode);">Product Option</td><td class="detail" id="product_detail"></td>

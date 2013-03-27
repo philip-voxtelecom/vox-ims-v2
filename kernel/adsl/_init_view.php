@@ -2,8 +2,8 @@
 
 require_once($GLOBALS['documentroot'] . '/classes/View.class.php');
 
-if (file_exists($GLOBALS['documentroot'] . '/Views/' . $GLOBALS['module'] .'/'. $GLOBALS['config']->view . '/_init_view.php')) {
-    include($GLOBALS['documentroot'] . '/Views/' . $GLOBALS['module'] .'/'. $GLOBALS['config']->view . '/_init_view.php');
+if (file_exists($GLOBALS['documentroot'] . '/Views/' . $GLOBALS['module'] .'/'. $GLOBALS['config']->adsl_view_provider . '/_init_view.php')) {
+    include($GLOBALS['documentroot'] . '/Views/' . $GLOBALS['module'] .'/'. $GLOBALS['config']->adsl_view_provider . '/_init_view.php');
 }
 
 function initPageDisplay() {

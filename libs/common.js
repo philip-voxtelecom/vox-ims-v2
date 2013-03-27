@@ -1,3 +1,5 @@
+var globalVar = [];
+
 function GeneratePassword(passFieldN, passSize) {
 
     var noPunction = 1;

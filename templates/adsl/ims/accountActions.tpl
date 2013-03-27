@@ -13,12 +13,14 @@
             <li><a style="background-color: #ffe0c6;" href="#" onclick="window.prevline = null; {$i->action}; xajax.$('search_return').style.display='';">{$i->face}</a></li>
         {/foreach}
 
+        <!-- 
         <li id="search_return" {if $return == false}style="display: none;"{/if}>
             <a href="#"  style="background-color: #ffe0c6;" onclick="window.prevline = null;
                 viewarray={ldelim}search:'{$search}',offset:{$offset},limit:{$limit}{rdelim};
                 xajax_accountView('listall',viewarray);">
                 Return to list</a>
         </li>
+        -->
 
     </ul>
 

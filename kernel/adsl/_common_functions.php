@@ -117,14 +117,14 @@ function append_simplexml(&$simplexml_to, &$simplexml_from) {
 }
 
 function load_provider_model($model) {
-    if (file_exists($GLOBALS['documentroot'] . '/Models/' . $GLOBALS['module'] . '/' . $GLOBALS['config']->provider . '/_' . $model . '_model.php')) {
-        include($GLOBALS['documentroot'] . '/Models/' . $GLOBALS['module'] . '/' . $GLOBALS['config']->provider . '/_' . $model . '_model.php');
+    if (file_exists($GLOBALS['documentroot'] . '/Models/' . $GLOBALS['module'] . '/' . $GLOBALS['config']->adsl_model_provider . '/_' . $model . '_model.php')) {
+        include($GLOBALS['documentroot'] . '/Models/' . $GLOBALS['module'] . '/' . $GLOBALS['config']->adsl_model_provider . '/_' . $model . '_model.php');
     }
 }
 
 function load_view($view) {
-    if (file_exists($GLOBALS['documentroot'] . '/Views/' . $GLOBALS['module'] . '/' . $GLOBALS['config']->view . '/_' . $view . '_view.php')) {
-        include($GLOBALS['documentroot'] . '/Views/' . $GLOBALS['module'] . '/' . $GLOBALS['config']->view . '/_' . $view . '_view.php');
+    if (file_exists($GLOBALS['documentroot'] . '/Views/' . $GLOBALS['module'] . '/' . $GLOBALS['config']->adsl_view_provider . '/_' . $view . '_view.php')) {
+        include($GLOBALS['documentroot'] . '/Views/' . $GLOBALS['module'] . '/' . $GLOBALS['config']->adsl_view_provider . '/_' . $view . '_view.php');
     }
 }
 
